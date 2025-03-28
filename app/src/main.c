@@ -8,7 +8,7 @@ int main(void)
 	printk("Zephyr Example Application for Pico\n");
 
 	while (1) {
-		printk("Running...\n");
+		printk("Running on %s...\n", CONFIG_BOARD);
 
 		k_sleep(K_MSEC(1000));
 	}

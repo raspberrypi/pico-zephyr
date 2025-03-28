@@ -2,7 +2,7 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Pico Debug (Zephyr)",
+            "name": "RP2350 Debug (Zephyr)",
             "cwd": "${userHome}/.pico-sdk/openocd/0.12.0+dev/scripts",
             "executable": "${workspaceFolder}/build/zephyr/zephyr.elf",
             "request": "launch",
@@ -19,18 +19,14 @@
             "runToEntryPoint": "main",
             // Fix for no_flash binaries, where monitor reset halt doesn't do what is expected
             // Also works fine for flash binaries
-            "overrideLaunchCommands": [
-                "monitor reset init",
-                "load C:/Users/Tim/Documents/MagpieEmbedded/RaspberryPi/pico_zephyr_workspace/pico_zephyr/build/zephyr/zephyr.elf"
-            ],
             "openOCDLaunchCommands": [
                 "adapter speed 5000"
             ]
         },
         {
-            "name": "Pico Debug (Cortex-Debug)",
+            "name": "RP2040 Debug (Zephyr)",
             "cwd": "${userHome}/.pico-sdk/openocd/0.12.0+dev/scripts",
-            "executable": "${command:raspberry-pi-pico.launchTargetPath}",
+            "executable": "${workspaceFolder}/build/zephyr/zephyr.elf",
             "request": "launch",
             "type": "cortex-debug",
             "servertype": "openocd",
@@ -39,20 +35,15 @@
             "device": "${command:raspberry-pi-pico.getChipUppercase}",
             "configFiles": [
                 "interface/cmsis-dap.cfg",
-                "target/${command:raspberry-pi-pico.getTarget}.cfg"
+                "target/rp2040.cfg"
             ],
             "svdFile": "${userHome}/.pico-sdk/sdk/2.1.1/src/${command:raspberry-pi-pico.getChip}/hardware_regs/${command:raspberry-pi-pico.getChipUppercase}.svd",
             "runToEntryPoint": "main",
             // Fix for no_flash binaries, where monitor reset halt doesn't do what is expected
             // Also works fine for flash binaries
-            "overrideLaunchCommands": [
-                "monitor reset init",
-                // "load \"${command:raspberry-pi-pico.launchTargetPath}\""
-                "load \"${command:raspberry-pi-pico.launchTargetPath}\""
-            ],
             "openOCDLaunchCommands": [
                 "adapter speed 5000"
             ]
-        }
+        },
     ]
 }
