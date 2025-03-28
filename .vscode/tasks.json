@@ -1,0 +1,59 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Zephyr Build RP2040",
+			"type": "shell",
+			"group": {
+				"kind": "build"
+			},
+			"linux": {
+				"command": "${workspaceFolder}/.venv/bin/west"
+			},
+			"windows": {
+				"command": "\"${workspaceFolder}\"/.venv/Scripts/west.exe"
+			},
+			"osx": {
+				"command": "${workspaceFolder}/.venv/bin/west"
+			},
+			"args": [
+				"build",
+				"-p",
+				"auto",
+				"-b",
+				"rpi_pico",
+                "app"
+			],
+			"problemMatcher": [
+				"$gcc"
+			]
+		},
+        {
+			"label": "Zephyr Build RP2350",
+			"type": "shell",
+			"group": {
+				"kind": "build"
+			},
+			"linux": {
+				"command": "${workspaceFolder}/.venv/Scripts/west.exe"
+			},
+			"windows": {
+				"command": "\"${workspaceFolder}\"/.venv/Scripts/west.exe"
+			},
+			"osx": {
+				"command": "${workspaceFolder}/.venv/Scripts/west.exe"
+			},
+			"args": [
+				"build",
+				"-p",
+				"auto",
+				"-b",
+				"rpi_pico2/rp2350a/m33",
+                "app"
+			],
+			"problemMatcher": [
+				"$gcc"
+			]
+		}
+	]
+}
