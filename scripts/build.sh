@@ -1,0 +1,1 @@
+west build -b rpi_pico app -p -- -DOPENOCD=/home/pico/openocd/src/openocd -DOPENOCD_DEFAULT_PATH=/home/pico/openocd/tcl/ -DRPI_PICO_DEBUG_ADAPTER=cmsis-dap
