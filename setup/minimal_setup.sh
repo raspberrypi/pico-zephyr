@@ -10,7 +10,7 @@ sudo apt install -y --no-install-recommends git cmake ninja-build gperf \
   make gcc libsdl2-dev libmagic1
 
 # Pico SDK dependencies
-sudo apt install -y cmake gcc-arm-none-eabi libnewlib-arm-none-eabi build-essential pkg-config
+# sudo apt install -y cmake gcc-arm-none-eabi libnewlib-arm-none-eabi build-essential pkg-config
 
 # Required on other linux platforms
 # sudo apt install --no-install-recommends gcc-multilib g++-multilib
@@ -33,11 +33,8 @@ west zephyr-export
 
 west sdk install -t arm-zephyr-eabi
 
-# Setup pico sdk
-sudo apt install -y wget
-wget https://raw.githubusercontent.com/raspberrypi/pico-setup/master/pico_setup.sh
-
-chmod +x pico_setup.sh
-
-./pico_setup.sh
-
+# Build openocd
+cd ../openocd
+./bootstrap
+./configure --enable-ftdi --enable-sysfsgpio --enable-bcm2835gpio --disable-werror
+make -j4
