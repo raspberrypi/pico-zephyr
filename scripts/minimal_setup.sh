@@ -9,8 +9,8 @@ sudo apt install -y --no-install-recommends git cmake ninja-build gperf \
   python3-dev python3-pip python3-setuptools python3-tk python3-wheel xz-utils file \
   make gcc libsdl2-dev libmagic1
 
-# Pico SDK dependencies
-sudo apt install -y cmake gcc-arm-none-eabi libnewlib-arm-none-eabi build-essential pkg-config libtool
+# OpenOCD dependencies
+sudo apt install -y pkg-config libtool libusb-1.0-0-dev
 
 # Required on other linux platforms
 # sudo apt install --no-install-recommends gcc-multilib g++-multilib
@@ -40,5 +40,5 @@ cd openocd
 make -j4
 
 # Generate build scripts
-cd pico-zephyr
+cd ../pico-zephyr
 ./scripts/build_scripts.sh
