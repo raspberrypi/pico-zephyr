@@ -34,7 +34,7 @@ west zephyr-export
 west sdk install -t arm-zephyr-eabi
 
 # Build openocd
-cd ../openocd
+cd openocd
 ./bootstrap
 ./configure --enable-ftdi --enable-sysfsgpio --enable-bcm2835gpio --disable-werror
 make -j4
