@@ -10,7 +10,7 @@ sudo apt install -y --no-install-recommends git cmake ninja-build gperf \
   make gcc libsdl2-dev libmagic1
 
 # Pico SDK dependencies
-# sudo apt install -y cmake gcc-arm-none-eabi libnewlib-arm-none-eabi build-essential pkg-config
+sudo apt install -y cmake gcc-arm-none-eabi libnewlib-arm-none-eabi build-essential pkg-config libtool
 
 # Required on other linux platforms
 # sudo apt install --no-install-recommends gcc-multilib g++-multilib
