@@ -38,3 +38,7 @@ cd openocd
 ./bootstrap
 ./configure --enable-ftdi --enable-sysfsgpio --enable-bcm2835gpio --disable-werror
 make -j4
+
+# Generate build scripts
+cd pico-zephyr
+./scripts/build_scripts.sh
