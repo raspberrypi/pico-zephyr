@@ -16,12 +16,13 @@ python -m venv .venv
 . .venv/bin/activate
 
 pip install west pyelftools
-west packages pip --install
 
 cd ..
 
 west init -l pico-zephyr
 west update
+
+west packages pip --install
 
 west zephyr-export
 
