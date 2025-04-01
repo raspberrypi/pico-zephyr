@@ -47,6 +47,18 @@ build_rp2040.sh
 build_rp2350.sh
 ```
 
+By default, this will use the UART serial port.
+To use the USB serial port which also powers the Pico, add `usb_serial_port` when building:
+
+```bash
+# For Pico H and Pico WH using RP2040:
+build_rp2040.sh usb_serial_port
+# For Pico 2 and Pico 2W using RP2350:
+build_rp2350.sh usb_serial_port
+```
+
+Note that when switching between UART and USB serial, it may be necessary to delete the build directory for this change to take effect.
+
 Flash the Pico:
 ```bash
 . .venv/bin/activate
@@ -79,7 +91,8 @@ minicom -D /dev/ttyACM0
 ```
 
 You may need to change `/dev/ttyACM0` to another value depending on the serial port the Debug Probe is recognised on.
-Find the port using `ls /dev/tty*`
+When the USB serial port is in use, it will may be found on a `/dev/ttyACM1`.
+Find the port using `ls /dev/tty*` while plugging and unplugging the debug probe or Pico board to see which values change.
 
 ## Debugging
 
