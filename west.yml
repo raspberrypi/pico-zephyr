@@ -8,6 +8,8 @@ manifest:
   remotes:
     - name: zephyrproject-rtos
       url-base: https://github.com/zephyrproject-rtos
+    - name: raspberrypi
+      url-base: https://github.com/raspberrypi
 
   projects:
     - name: zephyr
@@ -19,3 +21,7 @@ manifest:
         name-allowlist:
           - cmsis      # required by the ARM port
           - hal_rpi_pico # required for Pico board support
+    
+    - name: openocd
+      remote: raspberrypi
+      revision: sdk-2.0.0
