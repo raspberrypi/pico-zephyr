@@ -63,11 +63,23 @@ Install VSCode with:
 
 This will install VSCode and the [Cortex-Debug](https://marketplace.visualstudio.com/items?itemName=marus25.cortex-debug) extension.
 
-Open this folder in VSCode. You can run `code` from the command line.
+Open this folder in VSCode. You can run `code .` from the command line.
 
 To build, press `Ctrl+Shift+B` and select either `Zephyr Build RP2040` or `Zephyr Build RP2350` for the chip you are targetting.
+Press `Enter` to confirm the OpenOCD path or change it to the directory where OpenOCD is installed.
 
 To flash, press `Ctrl+Shift+B` and select `Zephyr Flash`.
+
+### View Output
+
+View the output via serial port with:
+
+```bash
+minicom -D /dev/ttyACM0
+```
+
+You may need to change `/dev/ttyACM0` to another value depending on the serial port the Debug Probe is recognised on.
+Find the port using `ls /dev/tty*`
 
 ## Debugging
 
@@ -94,15 +106,6 @@ Thread 1 "rp2350.dap.core0" hit Breakpoint 1, main () at /home/user/dev/pico-zep
 (gdb) n
 ```
 
-View the output via serial port with:
-
-```bash
-minicom -D /dev/ttyACM0
-```
-
-You may need to change `/dev/ttyACM0` to another value depending on the serial port the Debug Probe is recognised on.
-Find the port using `ls /dev/tty*`
-
 ### VSCode
 
 Install VSCode with:
@@ -113,11 +116,12 @@ Install VSCode with:
 
 This will install VSCode and the [Cortex-Debug](https://marketplace.visualstudio.com/items?itemName=marus25.cortex-debug) extension.
 
-Open this folder in VSCode. You can run `code` from the command line.
+Open this folder in VSCode. You can run `code .` from the command line.
 
 To debug, press `Ctrl+Shift+D` to open the `Run and Debug` pane.
 
 At the top, next to the `Start Debugging` button, you can select `RP2040 Debug (Zephyr)` or `RP2350 Debug (Zephyr)`  for the chip you are targetting.
+Press `Enter` to confirm the OpenOCD path or change it to the directory where OpenOCD is installed.
 
 VSCode will then enter the debugging view starting in `main`, where you can step over each instruction and inspect the source code.
 Further debugging instructions can be found [here](https://code.visualstudio.com/docs/debugtest/debugging#_debug-actions).
