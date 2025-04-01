@@ -10,7 +10,7 @@ sudo apt install -y --no-install-recommends git cmake ninja-build gperf \
   make gcc libsdl2-dev libmagic1
 
 # OpenOCD dependencies
-sudo apt install -y pkg-config libtool libusb-1.0-0-dev
+sudo apt install -y pkg-config libtool libusb-1.0-0-dev minicom
 
 # Required on other linux platforms
 # sudo apt install --no-install-recommends gcc-multilib g++-multilib
