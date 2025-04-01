@@ -78,6 +78,8 @@ This will install VSCode and the [Cortex-Debug](https://marketplace.visualstudio
 Open this folder in VSCode. You can run `code .` from the command line.
 
 To build, press `Ctrl+Shift+B` and select either `Zephyr Build RP2040` or `Zephyr Build RP2350` for the chip you are targetting.
+Select between the UART or USB for serial output.
+Note that when switching between UART and USB serial, it may be necessary to delete the build directory for this change to take effect.
 Press `Enter` to confirm the OpenOCD path or change it to the directory where OpenOCD is installed.
 
 To flash, press `Ctrl+Shift+B` and select `Zephyr Flash`.
