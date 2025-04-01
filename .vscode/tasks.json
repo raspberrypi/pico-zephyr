@@ -60,7 +60,26 @@
 			"problemMatcher": [
 				"$gcc"
 			]
-		}
+		},
+		{
+			"label": "Zephyr Flash",
+			"type": "shell",
+			"group": {
+				"kind": "build"
+			},
+			"linux": {
+				"command": "${workspaceFolder}/.venv/bin/west"
+			},
+			"windows": {
+				"command": "\"${workspaceFolder}\"/.venv/Scripts/west.exe"
+			},
+			"osx": {
+				"command": "${workspaceFolder}/.venv/bin/west"
+			},
+			"args": [
+				"flash"
+			]
+		},
 	],
 	"inputs": [
     {
