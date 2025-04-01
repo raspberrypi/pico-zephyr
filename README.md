@@ -6,6 +6,8 @@ The aim is to make it easy to get set up and going, with examples that point tow
 
 # Instructions
 
+## Installation
+
 From a blank Raspberry Pi image, open a terminal, create a folder and go into it:
 
 ```bash
@@ -32,6 +34,10 @@ While the command is running, plug your Pico board in via the Debug Probe:
 
 ![Debug Probe setup for Pico and Pico 2](https://www.raspberrypi.com/documentation/microcontrollers/images/labelled-wiring.jpg)
 
+## Building and Flashing
+
+### Command Line
+
 When the installation has finished, build the example image for your Pico:
 
 ```bash
@@ -46,6 +52,26 @@ Flash the Pico:
 . .venv/bin/activate
 west flash
 ```
+
+### VSCode
+
+Install VSCode with:
+
+```bash
+./scripts/vscode_setup.sh
+```
+
+This will install VSCode and the [Cortex-Debug](https://marketplace.visualstudio.com/items?itemName=marus25.cortex-debug) extension.
+
+Open this folder in VSCode. You can run `code` from the command line.
+
+To build, press `Ctrl+Shift+B` and select either `Zephyr Build RP2040` or `Zephyr Build RP2350` for the chip you are targetting.
+
+To flash, press `Ctrl+Shift+B` and select `Zephyr Flash`.
+
+## Debugging
+
+### Command Line
 
 Debug with gdb:
 ```bash
@@ -77,6 +103,21 @@ minicom -D /dev/ttyACM0
 You may need to change `/dev/ttyACM0` to another value depending on the serial port the Debug Probe is recognised on.
 Find the port using `ls /dev/tty*`
 
-# VSCode
+### VSCode
 
-Use VSCode to build and debug the app for RP2040 or RP2350
+Install VSCode with:
+
+```bash
+./scripts/vscode_setup.sh
+```
+
+This will install VSCode and the [Cortex-Debug](https://marketplace.visualstudio.com/items?itemName=marus25.cortex-debug) extension.
+
+Open this folder in VSCode. You can run `code` from the command line.
+
+To debug, press `Ctrl+Shift+D` to open the `Run and Debug` pane.
+
+At the top, next to the `Start Debugging` button, you can select `RP2040 Debug (Zephyr)` or `RP2350 Debug (Zephyr)`  for the chip you are targetting.
+
+VSCode will then enter the debugging view starting in `main`, where you can step over each instruction and inspect the source code.
+Further debugging instructions can be found [here](https://code.visualstudio.com/docs/debugtest/debugging#_debug-actions).
