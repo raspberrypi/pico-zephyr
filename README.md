@@ -48,9 +48,18 @@ west flash
 ```
 
 Debug with gdb:
-```
+```bash
 west debug
 ```
+
+View the output via serial port with:
+
+```bash
+minicom -D /dev/ttyACM0
+```
+
+You may need to change `/dev/ttyACM0` to another value depending on the serial port the Debug Probe is recognised on.
+Find the port using `ls /dev/tty*`
 
 # VSCode
 
