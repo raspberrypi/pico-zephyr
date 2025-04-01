@@ -25,13 +25,14 @@
         },
         {
             "name": "RP2040 Debug (Zephyr)",
-            "cwd": "${userHome}/.pico-sdk/openocd/0.12.0+dev/scripts",
             "executable": "${workspaceFolder}/build/zephyr/zephyr.elf",
             "request": "launch",
             "type": "cortex-debug",
             "servertype": "openocd",
-            "serverpath": "${input:openocd_install_dir}",
-            "gdbPath": "${command:raspberry-pi-pico.getGDBPath}",
+            "serverpath": "${input:openocd_install_dir}/src/openocd",
+            "searchDir": ["${input:openocd_install_dir}/tcl"],
+            "toolchainPrefix": "arm-zephyr-eabi",
+            "armToolchainPath": "${userHome}/zephyr-sdk-0.17.0/arm-zephyr-eabi/bin",
             "device": "RP2040",
             "configFiles": [
                 "interface/cmsis-dap.cfg",
