@@ -9,6 +9,10 @@
             "servertype": "openocd",
             "serverpath": "${input:openocd_install_dir}/src/openocd",
             "searchDir": ["${input:openocd_install_dir}/tcl"],
+            "windows": {
+				"serverpath": "${input:openocd_install_dir}/openocd.exe",
+                "searchDir": ["${input:openocd_install_dir}/scripts"]
+			},
             "toolchainPrefix": "arm-zephyr-eabi",
             "armToolchainPath": "${userHome}/zephyr-sdk-0.17.0/arm-zephyr-eabi/bin",
             "device": "RP2350",
@@ -31,6 +35,10 @@
             "servertype": "openocd",
             "serverpath": "${input:openocd_install_dir}/src/openocd",
             "searchDir": ["${input:openocd_install_dir}/tcl"],
+            "windows": {
+				"serverpath": "${input:openocd_install_dir}/openocd.exe",
+                "searchDir": ["${input:openocd_install_dir}/scripts"]
+			},
             "toolchainPrefix": "arm-zephyr-eabi",
             "armToolchainPath": "${userHome}/zephyr-sdk-0.17.0/arm-zephyr-eabi/bin",
             "device": "RP2040",

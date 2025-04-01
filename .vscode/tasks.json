@@ -11,7 +11,18 @@
 				"command": "${workspaceFolder}/.venv/bin/west"
 			},
 			"windows": {
-				"command": "\"${workspaceFolder}\"/.venv/Scripts/west.exe"
+				"command": "\"${workspaceFolder}\"/.venv/Scripts/west.exe",
+				"args": [
+					"build",
+					"-p",
+					"auto",
+					"-b",
+					"rpi_pico",
+					"app",
+					"--",
+					"-DOPENOCD=${input:openocd_install_dir}/openocd.exe",
+					"-DOPENOCD_DEFAULT_PATH=${input:openocd_install_dir}/scripts"
+				],
 			},
 			"osx": {
 				"command": "${workspaceFolder}/.venv/bin/west"
@@ -41,7 +52,18 @@
 				"command": "${workspaceFolder}/.venv/bin/west"
 			},
 			"windows": {
-				"command": "\"${workspaceFolder}\"/.venv/Scripts/west.exe"
+				"command": "\"${workspaceFolder}\"/.venv/Scripts/west.exe",
+				"args": [
+					"build",
+					"-p",
+					"auto",
+					"-b",
+					"rpi_pico2/rp2350a/m33",
+					"app",
+					"--",
+					"-DOPENOCD=${input:openocd_install_dir}/openocd.exe",
+					"-DOPENOCD_DEFAULT_PATH=${input:openocd_install_dir}/scripts"
+				],
 			},
 			"osx": {
 				"command": "${workspaceFolder}/.venv/Scripts/west"
