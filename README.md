@@ -50,6 +50,22 @@ west flash
 Debug with gdb:
 ```bash
 west debug
+...
+(gdb) break main
+(gdb) run
+Thread 1 "rp2350.dap.core0" hit Breakpoint 1, main () at /home/user/dev/pico-zephyr/app/src/main.c:8
+8               printk("Zephyr Example Application for Pico\n");
+(gdb) n
+11                      printk("Running on %s...\n", CONFIG_BOARD);
+(gdb) n
+13                      k_sleep(K_MSEC(1000));
+(gdb) n
+10              while (1) {
+(gdb) n
+11                      printk("Running on %s...\n", CONFIG_BOARD);
+(gdb) n
+13                      k_sleep(K_MSEC(1000));
+(gdb) n
 ```
 
 View the output via serial port with:
