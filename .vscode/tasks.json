@@ -7,6 +7,11 @@
 			"group": {
 				"kind": "build"
 			},
+			"options": {
+				"env": {
+					"SNIPPET_ROOT": "${workspaceFolder}"
+				}
+			},
 			"linux": {
 				"command": "${workspaceFolder}/.venv/bin/west"
 			},
@@ -19,6 +24,7 @@
 					"-b",
 					"rpi_pico",
 					"app",
+					"${input:usb_serial_port}",
 					"--",
 					"-DOPENOCD=${input:openocd_install_dir}/openocd.exe",
 					"-DOPENOCD_DEFAULT_PATH=${input:openocd_install_dir}/scripts"
@@ -34,6 +40,7 @@
 				"-b",
 				"rpi_pico",
                 "app",
+				"${input:usb_serial_port}",
 				"--",
 				"-DOPENOCD=${input:openocd_install_dir}/src/openocd",
 				"-DOPENOCD_DEFAULT_PATH=${input:openocd_install_dir}/tcl"
@@ -47,6 +54,11 @@
 			"type": "shell",
 			"group": {
 				"kind": "build"
+			},			
+			"options": {
+				"env": {
+					"SNIPPET_ROOT": "${workspaceFolder}"
+				}
 			},
 			"linux": {
 				"command": "${workspaceFolder}/.venv/bin/west"
@@ -60,6 +72,7 @@
 					"-b",
 					"rpi_pico2/rp2350a/m33",
 					"app",
+					"${input:usb_serial_port}",
 					"--",
 					"-DOPENOCD=${input:openocd_install_dir}/openocd.exe",
 					"-DOPENOCD_DEFAULT_PATH=${input:openocd_install_dir}/scripts"
@@ -75,6 +88,7 @@
 				"-b",
 				"rpi_pico2/rp2350a/m33",
                 "app",
+				"${input:usb_serial_port}",
 				"--",
 				"-DOPENOCD=${input:openocd_install_dir}/src/openocd",
 				"-DOPENOCD_DEFAULT_PATH=${input:openocd_install_dir}/tcl"
@@ -101,7 +115,7 @@
 			"args": [
 				"flash"
 			]
-		},
+		}
 	],
 	"inputs": [
     {
@@ -109,6 +123,16 @@
       "type": "promptString",
       "description": "Top level openocd install directory, e.g /home/openocd",
 	  "default": "${workspaceFolder}/../openocd"
-    }
+    },
+	{
+		"id": "usb_serial_port",
+		"type": "pickString",
+		"description": "Select whether to use the UART serial port or the USB serial port",
+		"default": "",
+		"options": [
+			{"label": "UART", "value": ""},
+			{"label": "USB", "value": "-S usb_serial_port"}
+      ],
+	}
   ]
 }
