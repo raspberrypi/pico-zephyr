@@ -1,0 +1,12 @@
+/ {
+	chosen {
+		zephyr,console = &usb_serial_port;
+		zephyr,shell-uart = &usb_serial_port;
+	};
+};
+
+&zephyr_udc0 {
+	usb_serial_port: usb_serial_port {
+		compatible = "zephyr,cdc-acm-uart";
+	};
+};
