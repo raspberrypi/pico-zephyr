@@ -22,7 +22,10 @@
 				"auto",
 				"-b",
 				"rpi_pico",
-                "app"
+                "app",
+				"--",
+				"-DOPENOCD=${input:openocd_install_dir}/src/openocd",
+				"-DOPENOCD_DEFAULT_PATH=${input:openocd_install_dir}/tcl"
 			],
 			"problemMatcher": [
 				"$gcc"
@@ -35,13 +38,13 @@
 				"kind": "build"
 			},
 			"linux": {
-				"command": "${workspaceFolder}/.venv/Scripts/west.exe"
+				"command": "${workspaceFolder}/.venv/bin/west"
 			},
 			"windows": {
 				"command": "\"${workspaceFolder}\"/.venv/Scripts/west.exe"
 			},
 			"osx": {
-				"command": "${workspaceFolder}/.venv/Scripts/west.exe"
+				"command": "${workspaceFolder}/.venv/Scripts/west"
 			},
 			"args": [
 				"build",
@@ -49,11 +52,22 @@
 				"auto",
 				"-b",
 				"rpi_pico2/rp2350a/m33",
-                "app"
+                "app",
+				"--",
+				"-DOPENOCD=${input:openocd_install_dir}/src/openocd",
+				"-DOPENOCD_DEFAULT_PATH=${input:openocd_install_dir}/tcl"
 			],
 			"problemMatcher": [
 				"$gcc"
 			]
 		}
-	]
+	],
+	"inputs": [
+    {
+      "id": "openocd_install_dir",
+      "type": "promptString",
+      "description": "Top level openocd install directory, e.g /home/openocd",
+	  "default": "${workspaceFolder}/../openocd"
+    }
+  ]
 }
