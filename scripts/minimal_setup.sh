@@ -29,6 +29,7 @@ west update
 
 west packages pip --install
 
+west blobs fetch hal_infineon
 west zephyr-export
 
 west sdk install -t arm-zephyr-eabi

@@ -21,6 +21,7 @@ manifest:
         name-allowlist:
           - cmsis      # required by the ARM port
           - hal_rpi_pico # required for Pico board support
+          - hal_infineon
     
     - name: openocd
       remote: raspberrypi
