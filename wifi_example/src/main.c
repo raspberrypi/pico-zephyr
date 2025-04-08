@@ -122,27 +122,23 @@ static int wifi_connect()
 	printk("Connection succeeded.\n");
 
 	// Ping Google DNS 4 times
-    ping("8.8.8.8", 4);
-
-	int config_init_result = net_config_init_app(NULL, "HTTP GET Example Application");
-	printk("config_init_result: %d\n", config_init_result);
-
-	printk("Preparing HTTP GET request for http://" HTTP_HOST
-		":" HTTP_PORT HTTP_PATH "\n");
+    // ping("8.8.8.8", 4);
 
 	static struct addrinfo hints;
 	struct addrinfo *res;
 	int st, sock;
 
-	hints.ai_family = AF_INET;
+	printk("Looking up IP addresses:\n");
+    hints.ai_family = AF_UNSPEC;
 	hints.ai_socktype = SOCK_STREAM;
 	st = getaddrinfo(HTTP_HOST, HTTP_PORT, &hints, &res);
-	printk("getaddrinfo status: %d\n", st);
-
 	if (st != 0) {
 		printk("Unable to resolve address, quitting\n");
 		return 0;
 	}
+	printk("getaddrinfo status: %d\n", st);
+
+    printk("\nConnecting to HTTP Server:\n");	
 
 	dump_addrinfo(res);
 
