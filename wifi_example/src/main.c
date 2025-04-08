@@ -33,8 +33,6 @@ void dump_addrinfo(const struct addrinfo *ai)
 
 static int wifi_connect()
 {
-	printk("Attempting to connect to network %s...\n", WIFI_SSID);
-
 	struct net_if *iface = net_if_get_default();
 	struct wifi_connect_req_params cnx_params = { 0 };
 
@@ -50,11 +48,16 @@ static int wifi_connect()
 	cnx_params.bandwidth = WIFI_FREQ_BANDWIDTH_20MHZ;
 	cnx_params.verify_peer_cert = false;
 
-	int ret = net_mgmt(NET_REQUEST_WIFI_CONNECT, iface,
-			&cnx_params, sizeof(struct wifi_connect_req_params));
-	if (ret) {
-		printk("Connection request failed with error: %d\n", ret);
-		return -ENOEXEC;
+	int connection_result = 1;
+	
+	while (connection_result != 0){
+		printk("Attempting to connect to network %s...\n", WIFI_SSID);
+		connection_result = net_mgmt(NET_REQUEST_WIFI_CONNECT, iface,
+				&cnx_params, sizeof(struct wifi_connect_req_params));
+		if (connection_result) {
+			printk("Connection request failed with error: %d\n", connection_result);
+		}
+		k_sleep(K_MSEC(1000));
 	}
 
 	printk("Connection succeeded.\n");
