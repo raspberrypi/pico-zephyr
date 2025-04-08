@@ -7,10 +7,16 @@
 
 // Wifi specific code
 #include <zephyr/net/net_config.h>
+#include <zephyr/net/icmp.h>
 #include <zephyr/net/net_if.h>
+#include <zephyr/net/net_ip.h>
 #include <zephyr/net/socket.h>
 #include <zephyr/net/wifi_mgmt.h>
 #include <zephyr/posix/netdb.h>
+
+// Helper macros
+#define SSTRLEN(s) (sizeof(s) - 1)
+#define CHECK(r) { if (r < 0) { printf("Error: %d\n", (int)r); exit(1); } }
 
 /* HTTP server to connect to */
 #define HTTP_HOST "google.com"
@@ -25,10 +31,63 @@ static char response[1024];
 
 void dump_addrinfo(const struct addrinfo *ai)
 {
-	printf("addrinfo @%p: ai_family=%d, ai_socktype=%d, ai_protocol=%d, "
+	printk("addrinfo @%p: ai_family=%d, ai_socktype=%d, ai_protocol=%d, "
 	       "sa_family=%d, sin_port=%x\n",
 	       ai, ai->ai_family, ai->ai_socktype, ai->ai_protocol, ai->ai_addr->sa_family,
 	       ntohs(((struct sockaddr_in *)ai->ai_addr)->sin_port));
+}
+
+static int icmp_echo_reply_handler(struct net_icmp_ctx *ctx,
+				struct net_pkt *pkt,
+				struct net_icmp_ip_hdr *hdr,
+				struct net_icmp_hdr *icmp_hdr,
+				void *user_data)
+{
+	uint32_t cycles;
+	char ipv4[INET_ADDRSTRLEN];
+	zsock_inet_ntop(AF_INET, &hdr->ipv4->src, ipv4, INET_ADDRSTRLEN);
+
+	uint32_t *start_cycles = user_data;
+
+	cycles = k_cycle_get_32() - *start_cycles;
+
+	printk("Reply from %s: bytes=%d time=%dms TTL=%d\r\n",
+			ipv4,
+			ntohs(hdr->ipv4->len),
+			((uint32_t)k_cyc_to_ns_floor64(cycles) / 1000000),
+			hdr->ipv4->ttl);
+}
+
+void ping(char* ipv4_addr, uint8_t count)
+{
+	uint32_t cycles;
+	int ret;
+	struct net_icmp_ctx icmp_context;
+
+	// Register handler for echo reply
+	ret = net_icmp_init_ctx(&icmp_context, NET_ICMPV4_ECHO_REPLY, 0, icmp_echo_reply_handler);
+	if (ret != 0) {
+		printk("Failed to init ping, err: %d", ret);
+	}
+
+	struct net_icmp_ping_params params;
+
+	struct net_if *iface = net_if_get_default();
+	struct sockaddr_in dst_addr;
+	net_addr_pton(AF_INET, ipv4_addr, &dst_addr.sin_addr);
+	dst_addr.sin_family = AF_INET;
+
+	for (int i = 0; i < count; i++)
+	{
+		cycles = k_cycle_get_32();
+		ret = net_icmp_send_echo_request(&icmp_context, iface, &dst_addr, NULL, &cycles);
+		if (ret != 0) {
+			printk("Failed to send ping, err: %d", ret);
+		}
+		k_sleep(K_SECONDS(2));
+	}
+
+	net_icmp_cleanup_ctx(&icmp_context);
 }
 
 static int wifi_connect()
@@ -62,6 +121,9 @@ static int wifi_connect()
 
 	printk("Connection succeeded.\n");
 
+	// Ping Google DNS 4 times
+    ping("8.8.8.8", 4);
+
 	int config_init_result = net_config_init_app(NULL, "HTTP GET Example Application");
 	printk("config_init_result: %d\n", config_init_result);
 
@@ -81,6 +143,48 @@ static int wifi_connect()
 		printk("Unable to resolve address, quitting\n");
 		return 0;
 	}
+
+	dump_addrinfo(res);
+
+	sock = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
+	if (sock < 0)
+	{
+		printk("Issue setting up socket: %d\n", sock);
+		return 0;
+	}
+	printk("sock = %d\n", sock);
+
+	printk("Connecting to server...\n");
+	int connect_result = connect(sock, res->ai_addr, res->ai_addrlen);
+	if (connect_result != 0)
+	{
+		printk("Issue during connect: %d\n", sock);
+		return 0;
+	}
+	printk("Connected!\nSending request...\n");
+	CHECK(send(sock, REQUEST, SSTRLEN(REQUEST), 0));
+
+	printk("Response:\n\n");
+
+	while (1) {
+		int len = recv(sock, response, sizeof(response) - 1, 0);
+
+		if (len < 0) {
+			printk("Error reading response\n");
+			return 0;
+		}
+
+		if (len == 0) {
+			break;
+		}
+
+		response[len] = 0;
+		printk("%s", response);
+	}
+
+	printk("\nClose socket\n");
+
+	(void)close(sock);
 
 	return 0;
 }
