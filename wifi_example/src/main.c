@@ -18,15 +18,13 @@
 #include "http.h"
 #include "ping.h"
 #include "wifi.h"
+#include "wifi_info.h"
 
 // Helper macros
 #define CHECK(r) { if (r < 0) { printf("Error: %d\n", (int)r); exit(1); } }
 
 /* HTTP server to connect to */
 #define HTTP_PORT "80"
-
-#define WIFI_SSID "my_ssid"
-#define WIFI_PSK  "my_password"
 
 const char HTTP_HOSTNAME[] = "google.com";
 const char HTTP_PATH[] = "/";
