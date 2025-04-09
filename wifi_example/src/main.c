@@ -22,30 +22,11 @@ const char JSON_HOSTNAME[] = "jsonplaceholder.typicode.com";
 const char JSON_GET_PATH[] = "/posts/1";
 const char JSON_POST_PATH[] = "/posts";
 const char json_post_payload[] = "{\"title\": \"RPi\", \"body\": \"Pico\", \"userId\": 199}";
-struct placeholder_create_new_post new_post = {
-	.title = "RPi",
-	.body = "Pico",
-	.userId = 199
-};
+
 
 int main(void)
 {
-
-	char json_payload_buffer[128];
-	int encode_status = json_obj_encode_buf(
-		placeholder_create_new_post_descr,
-		ARRAY_SIZE(placeholder_create_new_post_descr),
-		&new_post,
-		json_payload_buffer,
-		sizeof(json_payload_buffer)
-	);
-	if (encode_status < 0)
-	{
-		LOG_ERR("Error encoding JSON payload: %d", encode_status);
-		return -1;
-	}
-
-	printk("Starting wifi example...\n");
+	printk("Starting wifi example on %s\n", CONFIG_BOARD_TARGET);
 
 	wifi_connect(WIFI_SSID, WIFI_PSK);
 
@@ -68,12 +49,17 @@ int main(void)
 		printk("Got JSON result:\n");
 		printk("Title: %s\n", get_post_result.title);
 		printk("Body: %s\n", get_post_result.body);
-		printk("User ID: %d\n", get_post_result.id);
-		printk("ID: %d\n", get_post_result.userId);
+		printk("User ID: %d\n", get_post_result.userId);
+		printk("ID: %d\n", get_post_result.id);
 	}
 	k_sleep(K_SECONDS(1));
 
 	struct placeholder_post new_post_result;
+	struct placeholder_new_post new_post = { 
+		.body = "RPi",
+		.title = "Pico",
+		.userId = 199
+	};
 
 	json_get_status = json_post_example(JSON_HOSTNAME, JSON_POST_PATH, &new_post, &new_post_result);
 	if (json_get_status < 0)
@@ -83,8 +69,8 @@ int main(void)
 		printk("Got JSON result:\n");
 		printk("Title: %s\n", new_post_result.title);
 		printk("Body: %s\n", new_post_result.body);
-		printk("User ID: %d\n", new_post_result.id);
-		printk("ID: %d\n", new_post_result.userId);
+		printk("User ID: %d\n", new_post_result.userId);
+		printk("ID: %d\n", new_post_result.id);
 	}
 	k_sleep(K_SECONDS(1));
 

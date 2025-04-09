@@ -208,7 +208,7 @@ int json_get_example(const char * hostname, const char * path, struct placeholde
 	return json_parse_result;
 }
 
-int json_post_example(const char * hostname, const char * path, struct placeholder_create_new_post * payload, struct placeholder_post * result)
+int json_post_example(const char * hostname, const char * path, struct placeholder_new_post * payload, struct placeholder_post * result)
 {
 	json_parse_result = -1;
 	returned_placeholder_post = result;
