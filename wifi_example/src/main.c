@@ -90,7 +90,7 @@ void ping(char* ipv4_addr, uint8_t count)
 	net_icmp_cleanup_ctx(&icmp_context);
 }
 
-static int wifi_connect()
+void wifi_connect()
 {
 	struct net_if *iface = net_if_get_default();
 	struct wifi_connect_req_params cnx_params = { 0 };
@@ -120,13 +120,10 @@ static int wifi_connect()
 	}
 
 	printk("Connection succeeded.\n");
+}
 
-	// Ping Google DNS 4 times
-	printk("Pinging 8.8.8.8 to demonstrate connection:\n");
-    ping("8.8.8.8", 4);
-
-	printk("Now performing http GET request to google.com...\n");
-
+void http_get_example()
+{
 	static struct addrinfo hints;
 	struct addrinfo *res;
 	int st, sock;
@@ -137,7 +134,7 @@ static int wifi_connect()
 	st = getaddrinfo(HTTP_HOST, HTTP_PORT, &hints, &res);
 	if (st != 0) {
 		printk("Unable to resolve address, quitting\n");
-		return 0;
+		return;
 	}
 	printk("getaddrinfo status: %d\n", st);
 
@@ -147,7 +144,7 @@ static int wifi_connect()
 	if (sock < 0)
 	{
 		printk("Issue setting up socket: %d\n", sock);
-		return 0;
+		return;
 	}
 	printk("sock = %d\n", sock);
 
@@ -156,7 +153,7 @@ static int wifi_connect()
 	if (connect_result != 0)
 	{
 		printk("Issue during connect: %d\n", sock);
-		return 0;
+		return;
 	}
 	printk("Connected!\nSending request...\n");
 	CHECK(send(sock, REQUEST, SSTRLEN(REQUEST), 0));
@@ -171,7 +168,7 @@ static int wifi_connect()
 
 		if (len < 0) {
 			printk("Error reading response\n");
-			return 0;
+			return;
 		}
 
 		if (len == 0) {
@@ -187,8 +184,6 @@ static int wifi_connect()
 	printk("\nClose socket\n");
 
 	(void)close(sock);
-
-	return 0;
 }
  
 int main(void)
@@ -196,6 +191,14 @@ int main(void)
 	printk("Starting wifi example...\n");
 
 	wifi_connect();
+
+	// Ping Google DNS 4 times
+	printk("Pinging 8.8.8.8 to demonstrate connection:\n");
+    ping("8.8.8.8", 4);
+
+	printk("Now performing http GET request to google.com...\n");
+
+	http_get_example();
 
 	return 0;
 }
