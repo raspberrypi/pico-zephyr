@@ -14,7 +14,10 @@
 #include <zephyr/net/socket.h>
 #include <zephyr/net/wifi_mgmt.h>
 
+// Local includes
+#include "http.h"
 #include "ping.h"
+#include "wifi.h"
 
 // Helper macros
 #define CHECK(r) { if (r < 0) { printf("Error: %d\n", (int)r); exit(1); } }
@@ -35,46 +38,6 @@ static K_SEM_DEFINE(http_response_complete, 0, 1);
 static K_SEM_DEFINE(json_response_complete, 0, 1);
 
 static char response_buffer[1024];
-
-void dump_addrinfo(const struct addrinfo *ai)
-{
-	printk("addrinfo @%p: ai_family=%d, ai_socktype=%d, ai_protocol=%d, "
-	       "sa_family=%d, sin_port=%x\n",
-	       ai, ai->ai_family, ai->ai_socktype, ai->ai_protocol, ai->ai_addr->sa_family,
-	       ntohs(((struct sockaddr_in *)ai->ai_addr)->sin_port));
-}
-
-void wifi_connect()
-{
-	struct net_if *iface = net_if_get_default();
-	struct wifi_connect_req_params cnx_params = { 0 };
-
-	cnx_params.ssid = WIFI_SSID;
-	cnx_params.ssid_length = strlen(cnx_params.ssid);
-	cnx_params.psk = WIFI_PSK;
-	cnx_params.psk_length = strlen(cnx_params.psk);
-	cnx_params.band = WIFI_FREQ_BAND_UNKNOWN;
-	cnx_params.channel = WIFI_CHANNEL_ANY;
-	cnx_params.mfp = WIFI_MFP_OPTIONAL;
-	cnx_params.wpa3_ent_mode = WIFI_WPA3_ENTERPRISE_NA;
-	cnx_params.eap_ver = 1;
-	cnx_params.bandwidth = WIFI_FREQ_BANDWIDTH_20MHZ;
-	cnx_params.verify_peer_cert = false;
-
-	int connection_result = 1;
-	
-	while (connection_result != 0){
-		printk("Attempting to connect to network %s...\n", WIFI_SSID);
-		connection_result = net_mgmt(NET_REQUEST_WIFI_CONNECT, iface,
-				&cnx_params, sizeof(struct wifi_connect_req_params));
-		if (connection_result) {
-			printk("Connection request failed with error: %d\n", connection_result);
-		}
-		k_sleep(K_MSEC(1000));
-	}
-
-	printk("Connection succeeded.\n");
-}
 
 void http_response_cb(struct http_response *rsp,
 	enum http_final_call final_data,
@@ -128,8 +91,8 @@ void http_get_example()
 	int ret;
 
 	req.method = HTTP_GET;
-	req.url = JSON_GET_PATH;
-	req.host = JSON_HOSTNAME;
+	req.host = HTTP_HOSTNAME;
+	req.url = HTTP_PATH;
 	req.protocol = "HTTP/1.1";
 	req.response = http_response_cb;
 	req.recv_buf = response_buffer;
@@ -200,8 +163,8 @@ void json_get_example()
 	int ret;
 
 	req.method = HTTP_GET;
-	req.url = JSON_GET_PATH;
 	req.host = JSON_HOSTNAME;
+	req.url = JSON_GET_PATH;
 	req.protocol = "HTTP/1.1";
 	req.response = json_response_cb;
 	req.recv_buf = response_buffer;
@@ -251,7 +214,7 @@ int main(void)
 {
 	printk("Starting wifi example...\n");
 
-	wifi_connect();
+	wifi_connect(WIFI_SSID, WIFI_PSK);
 
 	// Ping Google DNS 4 times
 	printk("Pinging 8.8.8.8 to demonstrate connection:\n");
