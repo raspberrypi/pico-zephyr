@@ -6,13 +6,14 @@
 #include <errno.h>
 
 // Wifi specific code
+#include <zephyr/posix/netdb.h>
+#include <zephyr/net/http/client.h>
 #include <zephyr/net/net_config.h>
 #include <zephyr/net/icmp.h>
 #include <zephyr/net/net_if.h>
 #include <zephyr/net/net_ip.h>
 #include <zephyr/net/socket.h>
 #include <zephyr/net/wifi_mgmt.h>
-#include <zephyr/posix/netdb.h>
 
 // Helper macros
 #define SSTRLEN(s) (sizeof(s) - 1)
@@ -26,6 +27,9 @@
 
 #define WIFI_SSID "my_ssid"
 #define WIFI_PSK  "my_password"
+
+const char JSON_HOSTNAME[] = "jsonplaceholder.typicode.com";
+const char JSON_PATH[] = "/todos/1";
 
 static char response[1024];
 
@@ -155,6 +159,7 @@ void http_get_example()
 		printk("Issue during connect: %d\n", sock);
 		return;
 	}
+
 	printk("Connected!\nSending request...\n");
 	CHECK(send(sock, REQUEST, SSTRLEN(REQUEST), 0));
 
@@ -185,6 +190,67 @@ void http_get_example()
 
 	(void)close(sock);
 }
+
+void json_response_cb(struct http_response *rsp,
+	enum http_final_call final_data,
+	void *user_data)
+{
+	printk("%.*s", rsp->data_len, rsp->recv_buf);
+}
+
+void json_get_example()
+{
+	static struct addrinfo hints;
+	struct addrinfo *res;
+	int st, sock;
+
+	printk("Looking up IP addresses:\n");
+    hints.ai_family = AF_UNSPEC;
+	hints.ai_socktype = SOCK_STREAM;
+	st = getaddrinfo(JSON_HOSTNAME, HTTP_PORT, &hints, &res);
+	if (st != 0) {
+		printk("Unable to resolve address, quitting\n");
+		return;
+	}
+	printk("getaddrinfo status: %d\n", st);
+
+	dump_addrinfo(res);
+
+	sock = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
+	if (sock < 0)
+	{
+		printk("Issue setting up socket: %d\n", sock);
+		return;
+	}
+	printk("sock = %d\n", sock);
+
+	printk("Connecting to server...\n");
+	int connect_result = connect(sock, res->ai_addr, res->ai_addrlen);
+	if (connect_result != 0)
+	{
+		printk("Issue during connect: %d\n", sock);
+		return;
+	}
+
+	struct http_request req = { 0 };
+	static uint8_t recv_buf[512];
+	int ret;
+
+	req.method = HTTP_GET;
+	req.url = JSON_PATH;
+	req.host = JSON_HOSTNAME;
+	req.protocol = "HTTP/1.1";
+	req.response = json_response_cb;
+	req.recv_buf = recv_buf;
+	req.recv_buf_len = sizeof(recv_buf);
+
+	/* sock is a file descriptor referencing a socket that has been connected
+	* to the HTTP server.
+	*/
+	ret = http_client_req(sock, &req, 5000, NULL);
+
+	(void)close(sock);
+}
  
 int main(void)
 {
@@ -199,6 +265,8 @@ int main(void)
 	printk("Now performing http GET request to google.com...\n");
 
 	http_get_example();
+	
+	json_get_example();
 
 	return 0;
 }
