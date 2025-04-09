@@ -2,9 +2,20 @@
 
 #include <zephyr/kernel.h>
 
-static K_SEM_DEFINE(http_response_complete, 0, 1);
+#include <zephyr/posix/netdb.h>
+#include <zephyr/net/http/client.h>
+#include <zephyr/net/net_config.h>
+#include <zephyr/net/net_if.h>
+#include <zephyr/net/net_ip.h>
+#include <zephyr/net/socket.h>
+#include <zephyr/net/wifi_mgmt.h>
 
-static char response_buffer[1024];
+#define HTTP_PORT "80"
+
+static K_SEM_DEFINE(json_response_complete, 0, 1);
+static K_SEM_DEFINE(http_response_complete, 0, 1);
+static const char * json_post_headers[] = { "Content-Type: application/json\r\n", NULL };
+static char response_buffer[2048];
 
 // void http_get(const char * hostname, const char * path);
 
@@ -45,7 +56,7 @@ int connect_socket(const char * hostname)
     return sock;
 }
 
-void http_response_cb(struct http_response *rsp,
+static void http_response_cb(struct http_response *rsp,
 	enum http_final_call final_data,
 	void *user_data)
 {
@@ -88,6 +99,98 @@ void http_get_example(const char * hostname, const char * path)
 	k_sem_take(&http_response_complete, K_FOREVER);
 
 	printk("\nClose socket\n");
+
+	(void)close(sock);
+}
+
+static void json_response_cb(struct http_response *rsp,
+	enum http_final_call final_data,
+	void *user_data)
+{
+	printk("JSON Callback: %.*s\n", rsp->data_len, rsp->recv_buf);
+
+	if (rsp->body_found)
+	{
+		printk("Body\n");
+		printk("%.*s", rsp->body_frag_len, rsp->body_frag_start);
+	}
+
+	if (HTTP_DATA_FINAL == final_data){
+		printk("\n");
+		k_sem_give(&json_response_complete);
+	}
+}
+
+void json_get_example(const char * hostname, const char * path)
+{
+	int sock = connect_socket(hostname);
+	if (sock < 0)
+	{
+		printk("Issue setting up socket: %d\n", sock);
+		return;
+	}
+
+	printk("Connected. Get JSON Payload...\n");
+
+	struct http_request req = { 0 };
+	int ret;
+
+	req.method = HTTP_GET;
+	req.host = hostname;
+	req.url = path;
+	req.protocol = "HTTP/1.1";
+	req.response = json_response_cb;
+	req.recv_buf = response_buffer;
+	req.recv_buf_len = sizeof(response_buffer);
+
+	/* sock is a file descriptor referencing a socket that has been connected
+	* to the HTTP server.
+	*/
+	ret = http_client_req(sock, &req, 5000, NULL);
+	printk("HTTP Client Request returned: %d\n", ret);
+
+	k_sem_take(&json_response_complete, K_FOREVER);
+
+	printk("JSON Response complete\n");
+
+	printk("Close socket\n");
+
+	(void)close(sock);
+}
+
+void json_post_example(const char * hostname, const char * path, const char * payload)
+{
+    int sock = connect_socket(hostname);
+	if (sock < 0)
+	{
+		printk("Issue setting up socket: %d\n", sock);
+		return;
+	}
+
+	printk("Connected. Post JSON Payload...\n");
+
+    struct http_request req = { 0 };
+	int ret;
+
+	req.method = HTTP_POST;
+	req.host = hostname;
+	req.url = path;
+	req.header_fields = json_post_headers;
+	req.protocol = "HTTP/1.1";
+	req.response = json_response_cb;
+	req.payload = payload;
+	req.payload_len = strlen(payload);
+	req.recv_buf = response_buffer;
+	req.recv_buf_len = sizeof(response_buffer);
+
+	ret = http_client_req(sock, &req, 5000, NULL);
+	printk("HTTP Client Request returned: %d\n", ret);
+
+	k_sem_take(&json_response_complete, K_FOREVER);
+
+	printk("JSON Response complete\n");
+
+	printk("Close socket\n");
 
 	(void)close(sock);
 }
