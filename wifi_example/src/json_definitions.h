@@ -17,4 +17,16 @@ static const struct json_obj_descr placeholder_post_descr[] = {
 	JSON_OBJ_DESCR_PRIM(struct placeholder_post, userId, JSON_TOK_NUMBER),
 };
 
+struct placeholder_new_post {
+	const char *title;
+	const char *body;
+    int userId;
+};
+
+static const struct json_obj_descr placeholder_create_new_post_descr[] = {
+	JSON_OBJ_DESCR_PRIM(struct placeholder_new_post, title, JSON_TOK_STRING),
+	JSON_OBJ_DESCR_PRIM(struct placeholder_new_post, body, JSON_TOK_STRING),
+	JSON_OBJ_DESCR_PRIM(struct placeholder_new_post, userId, JSON_TOK_NUMBER),
+};
+
 #endif // PICO_JSON_DEFINITIONS_H_

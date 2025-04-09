@@ -10,8 +10,8 @@ void dump_addrinfo(const struct addrinfo *ai);
 
 void http_get_example(const char * hostname, const char * path);
 
-int json_get_example(const char * hostname, const char * path, struct placeholder_post * post);
+int json_get_example(const char * hostname, const char * path, struct placeholder_post * result);
 
-void json_post_example(const char * hostname, const char * path, const char * payload);
+int json_post_example(const char * hostname, const char * path, struct placeholder_create_new_post * payload, struct placeholder_post * result);
 
 #endif // PICO_EXAMPLE_HTTP_H_

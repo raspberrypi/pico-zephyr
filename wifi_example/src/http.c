@@ -1,7 +1,6 @@
 #include "http.h"
 
 #include <zephyr/kernel.h>
-
 #include <zephyr/data/json.h>
 #include <zephyr/logging/log.h>
 #include <zephyr/net/http/client.h>
@@ -24,6 +23,9 @@ static const char * json_post_headers[] = { "Content-Type: application/json\r\n"
 
 // Holds the HTTP response
 static char response_buffer[2048];
+
+// Holds the JSON payload
+char json_payload_buffer[128];
 
 // Keeps track of JSON parsing result
 static struct placeholder_post * returned_placeholder_post = NULL;
@@ -159,10 +161,10 @@ static void json_response_cb(struct http_response *rsp,
 	}
 }
 
-int json_get_example(const char * hostname, const char * path, struct placeholder_post * post)
+int json_get_example(const char * hostname, const char * path, struct placeholder_post * result)
 {
 	json_parse_result = -1;
-	returned_placeholder_post = post;
+	returned_placeholder_post = result;
 
 	int sock = connect_socket(hostname);
 	if (sock < 0)
@@ -206,16 +208,46 @@ int json_get_example(const char * hostname, const char * path, struct placeholde
 	return json_parse_result;
 }
 
-void json_post_example(const char * hostname, const char * path, const char * payload)
+int json_post_example(const char * hostname, const char * path, struct placeholder_create_new_post * payload, struct placeholder_post * result)
 {
+	json_parse_result = -1;
+	returned_placeholder_post = result;
+
     int sock = connect_socket(hostname);
 	if (sock < 0)
 	{
 		printk("Issue setting up socket: %d\n", sock);
-		return;
+		return -1;
 	}
 
 	printk("Connected. Post JSON Payload...\n");
+
+	// Parse the JSON object into a buffer
+	int required_buffer_len = json_calc_encoded_len(
+		placeholder_create_new_post_descr,
+		ARRAY_SIZE(placeholder_create_new_post_descr),
+		payload
+	);
+	if (required_buffer_len > sizeof(json_payload_buffer))
+	{
+		LOG_ERR("Payload is too large. Increase size of json_payload_buffer in http.c");
+		return -1;
+	}
+
+	int encode_status = json_obj_encode_buf(
+		placeholder_create_new_post_descr,
+		ARRAY_SIZE(placeholder_create_new_post_descr),
+		payload,
+		json_payload_buffer,
+		sizeof(json_payload_buffer)
+	);
+	if (encode_status < 0)
+	{
+		LOG_ERR("Error encoding JSON payload: %d", encode_status);
+		return -1;
+	}
+
+	LOG_ERR("%s", json_payload_buffer);
 
     struct http_request req = { 0 };
 	int ret;
@@ -226,8 +258,8 @@ void json_post_example(const char * hostname, const char * path, const char * pa
 	req.header_fields = json_post_headers;
 	req.protocol = "HTTP/1.1";
 	req.response = json_response_cb;
-	req.payload = payload;
-	req.payload_len = strlen(payload);
+	req.payload = json_payload_buffer;
+	req.payload_len = strlen(json_payload_buffer);
 	req.recv_buf = response_buffer;
 	req.recv_buf_len = sizeof(response_buffer);
 
@@ -241,6 +273,8 @@ void json_post_example(const char * hostname, const char * path, const char * pa
 	printk("Close socket\n");
 
 	(void)close(sock);
+
+	return json_parse_result;
 }
 
 void dump_addrinfo(const struct addrinfo *ai)
