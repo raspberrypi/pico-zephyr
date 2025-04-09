@@ -11,14 +11,16 @@
 #include "wifi.h"
 #include "wifi_info.h"
 
+LOG_MODULE_REGISTER(wifi_example);
+
 /* HTTP server to connect to */
 const char HTTP_HOSTNAME[] = "google.com";
 const char HTTP_PATH[] = "/";
 const char JSON_HOSTNAME[] = "jsonplaceholder.typicode.com";
-const char JSON_GET_PATH[] = "/todos/1";
+const char JSON_GET_PATH[] = "/posts/1";
 const char JSON_POST_PATH[] = "/posts";
 const char json_post_payload[] = "{\"title\": \"RPi\", \"body\": \"Pico\", \"userId\": 199}";
- 
+
 int main(void)
 {
 	printk("Starting wifi example...\n");

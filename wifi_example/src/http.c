@@ -2,13 +2,17 @@
 
 #include <zephyr/kernel.h>
 
-#include <zephyr/posix/netdb.h>
+#include <zephyr/data/json.h>
+#include <zephyr/logging/log.h>
 #include <zephyr/net/http/client.h>
 #include <zephyr/net/net_config.h>
 #include <zephyr/net/net_if.h>
 #include <zephyr/net/net_ip.h>
 #include <zephyr/net/socket.h>
 #include <zephyr/net/wifi_mgmt.h>
+#include <zephyr/posix/netdb.h>
+
+LOG_MODULE_REGISTER(http);
 
 #define HTTP_PORT "80"
 
@@ -103,6 +107,20 @@ void http_get_example(const char * hostname, const char * path)
 	(void)close(sock);
 }
 
+struct placeholder_post {
+	const char *title;
+	const char *body;
+	int id;
+	int userId;
+};
+
+static const struct json_obj_descr placeholder_post_descr[] = {
+	JSON_OBJ_DESCR_PRIM(struct placeholder_post, title, JSON_TOK_STRING),
+	JSON_OBJ_DESCR_PRIM(struct placeholder_post, body, JSON_TOK_STRING),
+	JSON_OBJ_DESCR_PRIM(struct placeholder_post, id, JSON_TOK_NUMBER),
+	JSON_OBJ_DESCR_PRIM(struct placeholder_post, userId, JSON_TOK_NUMBER),
+};
+
 static void json_response_cb(struct http_response *rsp,
 	enum http_final_call final_data,
 	void *user_data)
@@ -113,6 +131,28 @@ static void json_response_cb(struct http_response *rsp,
 	{
 		printk("Body\n");
 		printk("%.*s", rsp->body_frag_len, rsp->body_frag_start);
+
+		struct placeholder_post p;
+		int ret = json_obj_parse(
+			rsp->body_frag_start,
+			rsp->body_frag_len,
+			placeholder_post_descr,
+			ARRAY_SIZE(placeholder_post_descr),
+			&p
+		);
+
+		if (ret < 0)
+		{
+			LOG_ERR("JSON Parse Error: %d", ret);
+		}
+		else
+		{
+			LOG_INF("json_obj_parse return code: %d", ret);
+			LOG_INF("Title: %s", p.title);
+			LOG_INF("Body: %s", p.body);
+			LOG_INF("User ID: %d", p.id);
+			LOG_INF("ID: %d", p.userId);
+		}
 	}
 
 	if (HTTP_DATA_FINAL == final_data){
