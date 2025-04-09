@@ -39,31 +39,31 @@ int connect_socket(const char * hostname)
 	struct addrinfo *res;
 	int st, sock;
 
-	printk("Looking up IP addresses:\n");
+	LOG_DBG("Looking up IP addresses:");
     hints.ai_family = AF_UNSPEC;
 	hints.ai_socktype = SOCK_STREAM;
 	st = getaddrinfo(hostname, HTTP_PORT, &hints, &res);
 	if (st != 0) {
-		printk("Unable to resolve address, quitting\n");
+		LOG_ERR("Unable to resolve address, quitting");
 		return -1;
 	}
-	printk("getaddrinfo status: %d\n", st);
+	LOG_DBG("getaddrinfo status: %d", st);
 
 	dump_addrinfo(res);
 
 	sock = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
 	if (sock < 0)
 	{
-		printk("Issue setting up socket: %d\n", sock);
+		LOG_ERR("Issue setting up socket: %d", sock);
 		return -1;
 	}
-	printk("sock = %d\n", sock);
+	LOG_DBG("sock = %d", sock);
 
-	printk("Connecting to server...\n");
+	LOG_INF("Connecting to server...");
 	int connect_result = connect(sock, res->ai_addr, res->ai_addrlen);
 	if (connect_result != 0)
 	{
-		printk("Issue during connect: %d\n", sock);
+		LOG_ERR("Issue during connect: %d", sock);
 		return -1;
 	}
 
@@ -87,11 +87,11 @@ void http_get_example(const char * hostname, const char * path)
 	int sock = connect_socket(hostname);
 	if (sock < 0)
 	{
-		printk("Issue setting up socket: %d\n", sock);
+		LOG_ERR("Issue setting up socket: %d", sock);
 		return;
 	}
 
-	printk("Connected. Making HTTP request...\n");
+	LOG_INF("Connected. Making HTTP request...");
 
 	struct http_request req = { 0 };
 	int ret;
@@ -108,11 +108,18 @@ void http_get_example(const char * hostname, const char * path)
 	* to the HTTP server.
 	*/
 	ret = http_client_req(sock, &req, 5000, NULL);
-	printk("HTTP Client Request returned: %d\n", ret);
+	LOG_INF("HTTP Client Request returned: %d", ret);
+	if (ret < 0)
+	{
+		LOG_ERR("Error sending HTTP Client Request");
+		return;
+	}
 
 	k_sem_take(&http_response_complete, K_FOREVER);
 
-	printk("\nClose socket\n");
+	LOG_INF("HTTP GET complete");
+
+	LOG_INF("Close socket");
 
 	(void)close(sock);
 }
@@ -121,12 +128,12 @@ static void json_response_cb(struct http_response *rsp,
 	enum http_final_call final_data,
 	void *user_data)
 {
-	printk("JSON Callback: %.*s\n", rsp->data_len, rsp->recv_buf);
+	LOG_DBG("JSON Callback: %.*s", rsp->data_len, rsp->recv_buf);
 
 	if (rsp->body_found)
 	{
-		printk("Body:\n");
-		printk("%.*s", rsp->body_frag_len, rsp->body_frag_start);
+		LOG_DBG("Body:");
+		printk("%.*s\n", rsp->body_frag_len, rsp->body_frag_start);
 
 		if (returned_placeholder_post != NULL)
 		{
@@ -156,7 +163,6 @@ static void json_response_cb(struct http_response *rsp,
 	}
 
 	if (HTTP_DATA_FINAL == final_data){
-		printk("\n");
 		k_sem_give(&json_response_complete);
 	}
 }
@@ -169,11 +175,11 @@ int json_get_example(const char * hostname, const char * path, struct json_examp
 	int sock = connect_socket(hostname);
 	if (sock < 0)
 	{
-		printk("Issue setting up socket: %d\n", sock);
+		LOG_ERR("Issue setting up socket: %d", sock);
 		return -1;
 	}
 
-	printk("Connected. Get JSON Payload...\n");
+	LOG_INF("Connected. Get JSON Payload...");
 
 	struct http_request req = { 0 };
 	int ret;
@@ -190,7 +196,7 @@ int json_get_example(const char * hostname, const char * path, struct json_examp
 	* to the HTTP server.
 	*/
 	ret = http_client_req(sock, &req, 5000, NULL);
-	printk("HTTP Client Request returned: %d\n", ret);
+	LOG_INF("HTTP Client Request returned: %d", ret);
 	if (ret < 0)
 	{
 		LOG_ERR("Error sending HTTP Client Request");
@@ -199,9 +205,9 @@ int json_get_example(const char * hostname, const char * path, struct json_examp
 
 	k_sem_take(&json_response_complete, K_FOREVER);
 
-	printk("JSON Response complete\n");
+	LOG_INF("JSON Response complete");
 
-	printk("Close socket\n");
+	LOG_INF("Close socket");
 
 	(void)close(sock);
 
@@ -216,11 +222,11 @@ int json_post_example(const char * hostname, const char * path, struct json_exam
     int sock = connect_socket(hostname);
 	if (sock < 0)
 	{
-		printk("Issue setting up socket: %d\n", sock);
+		LOG_ERR("Issue setting up socket: %d", sock);
 		return -1;
 	}
 
-	printk("Connected. Post JSON Payload...\n");
+	LOG_INF("Connected. Post JSON Payload...");
 
 	// Parse the JSON object into a buffer
 	int required_buffer_len = json_calc_encoded_len(
@@ -264,13 +270,18 @@ int json_post_example(const char * hostname, const char * path, struct json_exam
 	req.recv_buf_len = sizeof(response_buffer);
 
 	ret = http_client_req(sock, &req, 5000, NULL);
-	printk("HTTP Client Request returned: %d\n", ret);
+	LOG_INF("HTTP Client Request returned: %d", ret);
+	if (ret < 0)
+	{
+		LOG_ERR("Error sending HTTP Client Request");
+		return -1;
+	}
 
 	k_sem_take(&json_response_complete, K_FOREVER);
 
-	printk("JSON Response complete\n");
+	LOG_INF("JSON POST complete");
 
-	printk("Close socket\n");
+	LOG_INF("Close socket");
 
 	(void)close(sock);
 
@@ -279,8 +290,8 @@ int json_post_example(const char * hostname, const char * path, struct json_exam
 
 void dump_addrinfo(const struct addrinfo *ai)
 {
-	printk("addrinfo @%p: ai_family=%d, ai_socktype=%d, ai_protocol=%d, "
-	       "sa_family=%d, sin_port=%x\n",
+	LOG_INF("addrinfo @%p: ai_family=%d, ai_socktype=%d, ai_protocol=%d, "
+	       "sa_family=%d, sin_port=%x",
 	       ai, ai->ai_family, ai->ai_socktype, ai->ai_protocol, ai->ai_addr->sa_family,
 	       ntohs(((struct sockaddr_in *)ai->ai_addr)->sin_port));
 }

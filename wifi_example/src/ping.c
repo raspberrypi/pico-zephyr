@@ -1,8 +1,11 @@
 #include "ping.h"
 
 #include <zephyr/kernel.h>
+#include <zephyr/logging/log.h>
 #include <zephyr/net/icmp.h>
 #include <zephyr/net/socket.h>
+
+LOG_MODULE_REGISTER(ping);
 
 int icmp_echo_reply_handler(struct net_icmp_ctx *ctx,
     struct net_pkt *pkt,
@@ -18,7 +21,7 @@ int icmp_echo_reply_handler(struct net_icmp_ctx *ctx,
 
     cycles = k_cycle_get_32() - *start_cycles;
 
-    printk("Reply from %s: bytes=%d time=%dms TTL=%d\r\n",
+    LOG_INF("Reply from %s: bytes=%d time=%dms TTL=%d",
     ipv4,
     ntohs(hdr->ipv4->len),
     ((uint32_t)k_cyc_to_ns_floor64(cycles) / 1000000),
@@ -36,7 +39,7 @@ void ping(char* ipv4_addr, uint8_t count)
     // Register handler for echo reply
     ret = net_icmp_init_ctx(&icmp_context, NET_ICMPV4_ECHO_REPLY, 0, icmp_echo_reply_handler);
     if (ret != 0) {
-    printk("Failed to init ping, err: %d", ret);
+        LOG_ERR("Failed to init ping, err: %d", ret);
     }
 
     struct net_if *iface = net_if_get_default();
@@ -49,7 +52,7 @@ void ping(char* ipv4_addr, uint8_t count)
         cycles = k_cycle_get_32();
         ret = net_icmp_send_echo_request(&icmp_context, iface, (struct sockaddr *)&dst_addr, NULL, &cycles);
         if (ret != 0) {
-        printk("Failed to send ping, err: %d", ret);
+            LOG_ERR("Failed to send ping, err: %d", ret);
         }
         k_sleep(K_SECONDS(1));
     }

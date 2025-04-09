@@ -1,6 +1,9 @@
 #include "wifi.h"
 
+#include <zephyr/logging/log.h>
 #include <zephyr/net/wifi_mgmt.h>
+
+LOG_MODULE_REGISTER(wifi);
 
 void wifi_connect(const char * ssid, const char * psk)
 {
@@ -23,14 +26,14 @@ void wifi_connect(const char * ssid, const char * psk)
 	int connection_result = 1;
 	
 	while (connection_result != 0){
-		printk("Attempting to connect to network %s...\n", ssid);
+		LOG_INF("Attempting to connect to network %s", ssid);
 		connection_result = net_mgmt(NET_REQUEST_WIFI_CONNECT, iface,
 				&cnx_params, sizeof(struct wifi_connect_req_params));
 		if (connection_result) {
-			printk("Connection request failed with error: %d\n", connection_result);
+			LOG_ERR("Connection request failed with error: %d\n", connection_result);
 		}
 		k_sleep(K_MSEC(1000));
 	}
 
-	printk("Connection succeeded.\n");
+	LOG_INF("Connection succeeded.");
 }
