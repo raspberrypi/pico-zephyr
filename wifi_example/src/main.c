@@ -16,23 +16,22 @@
 #include <zephyr/net/wifi_mgmt.h>
 
 // Helper macros
-#define SSTRLEN(s) (sizeof(s) - 1)
 #define CHECK(r) { if (r < 0) { printf("Error: %d\n", (int)r); exit(1); } }
 
 /* HTTP server to connect to */
-#define HTTP_HOST "google.com"
 #define HTTP_PORT "80"
-#define HTTP_PATH "/"
-#define REQUEST "GET " HTTP_PATH " HTTP/1.1\r\nHost: " HTTP_HOST "\r\n\r\n"
-
-static K_SEM_DEFINE(json_response_complete, 0, 1);
 
 #define WIFI_SSID "my_ssid"
 #define WIFI_PSK  "my_password"
 
+const char HTTP_HOSTNAME[] = "google.com";
+const char HTTP_PATH[] = "/";
 const char JSON_HOSTNAME[] = "jsonplaceholder.typicode.com";
 const char JSON_GET_PATH[] = "/todos/1";
 const char JSON_POST_PATH[] = "/posts";
+
+static K_SEM_DEFINE(http_response_complete, 0, 1);
+static K_SEM_DEFINE(json_response_complete, 0, 1);
 
 static char response_buffer[1024];
 
@@ -91,7 +90,7 @@ void ping(char* ipv4_addr, uint8_t count)
 		if (ret != 0) {
 			printk("Failed to send ping, err: %d", ret);
 		}
-		k_sleep(K_SECONDS(2));
+		k_sleep(K_SECONDS(1));
 	}
 
 	net_icmp_cleanup_ctx(&icmp_context);
@@ -129,6 +128,18 @@ void wifi_connect()
 	printk("Connection succeeded.\n");
 }
 
+void http_response_cb(struct http_response *rsp,
+	enum http_final_call final_data,
+	void *user_data)
+{
+	printk("HTTP Callback: %.*s", rsp->data_len, rsp->recv_buf);
+
+	if (HTTP_DATA_FINAL == final_data){
+		printk("\n");
+		k_sem_give(&http_response_complete);
+	}
+}
+
 void http_get_example()
 {
 	static struct addrinfo hints;
@@ -138,7 +149,7 @@ void http_get_example()
 	printk("Looking up IP addresses:\n");
     hints.ai_family = AF_UNSPEC;
 	hints.ai_socktype = SOCK_STREAM;
-	st = getaddrinfo(HTTP_HOST, HTTP_PORT, &hints, &res);
+	st = getaddrinfo(HTTP_HOSTNAME, HTTP_PORT, &hints, &res);
 	if (st != 0) {
 		printk("Unable to resolve address, quitting\n");
 		return;
@@ -163,31 +174,26 @@ void http_get_example()
 		return;
 	}
 
-	printk("Connected!\nSending request...\n");
-	CHECK(send(sock, REQUEST, SSTRLEN(REQUEST), 0));
+	printk("Connected. Making HTTP request...\n");
 
-	printk("Response:\n\n");
+	struct http_request req = { 0 };
+	int ret;
 
-	int recv_count = 0;
+	req.method = HTTP_GET;
+	req.url = JSON_GET_PATH;
+	req.host = JSON_HOSTNAME;
+	req.protocol = "HTTP/1.1";
+	req.response = http_response_cb;
+	req.recv_buf = response_buffer;
+	req.recv_buf_len = sizeof(response_buffer);
 
-	while (1) {
-		int len = recv(sock, response_buffer, sizeof(response_buffer) - 1, 0);
-		recv_count++;
+	/* sock is a file descriptor referencing a socket that has been connected
+	* to the HTTP server.
+	*/
+	ret = http_client_req(sock, &req, 5000, NULL);
+	printk("HTTP Client Request returned: %d\n", ret);
 
-		if (len < 0) {
-			printk("Error reading response\n");
-			return;
-		}
-
-		if (len == 0) {
-			break;
-		}
-
-		response_buffer[len] = 0;
-		printk("%s", response_buffer);
-	}
-
-	printk("Received a total of %d responses\n", recv_count);
+	k_sem_take(&http_response_complete, K_FOREVER);
 
 	printk("\nClose socket\n");
 
@@ -198,9 +204,10 @@ void json_response_cb(struct http_response *rsp,
 	enum http_final_call final_data,
 	void *user_data)
 {
-	printk("%.*s", rsp->data_len, rsp->recv_buf);
+	printk("JSON Callback: %.*s", rsp->data_len, rsp->recv_buf);
 
 	if (HTTP_DATA_FINAL == final_data){
+		printk("\n");
 		k_sem_give(&json_response_complete);
 	}
 }
@@ -239,7 +246,7 @@ void json_get_example()
 		return;
 	}
 
-	printk("Get JSON Payload...\n");
+	printk("Connected. Get JSON Payload...\n");
 
 	struct http_request req = { 0 };
 	int ret;
@@ -259,6 +266,7 @@ void json_get_example()
 	printk("HTTP Client Request returned: %d\n", ret);
 
 	k_sem_take(&json_response_complete, K_FOREVER);
+	k_sleep(K_SECONDS(1));
 
 	printk("JSON Response complete\n");
 
@@ -284,6 +292,9 @@ void json_get_example()
 	k_sem_take(&json_response_complete, K_FOREVER);
 
 	printk("JSON Response complete\n");
+	k_sleep(K_SECONDS(1));
+
+	printk("Close socket\n");
 
 	(void)close(sock);
 }
@@ -300,7 +311,7 @@ int main(void)
 
 	printk("Now performing http GET request to google.com...\n");
 
-	// http_get_example();
+	http_get_example();
 	
 	json_get_example();
 
