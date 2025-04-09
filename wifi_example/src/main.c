@@ -37,7 +37,7 @@ void dump_addrinfo(const struct addrinfo *ai)
 	       ntohs(((struct sockaddr_in *)ai->ai_addr)->sin_port));
 }
 
-static int icmp_echo_reply_handler(struct net_icmp_ctx *ctx,
+int icmp_echo_reply_handler(struct net_icmp_ctx *ctx,
 				struct net_pkt *pkt,
 				struct net_icmp_ip_hdr *hdr,
 				struct net_icmp_hdr *icmp_hdr,
@@ -56,6 +56,8 @@ static int icmp_echo_reply_handler(struct net_icmp_ctx *ctx,
 			ntohs(hdr->ipv4->len),
 			((uint32_t)k_cyc_to_ns_floor64(cycles) / 1000000),
 			hdr->ipv4->ttl);
+
+	return 0;
 }
 
 void ping(char* ipv4_addr, uint8_t count)
@@ -70,8 +72,6 @@ void ping(char* ipv4_addr, uint8_t count)
 		printk("Failed to init ping, err: %d", ret);
 	}
 
-	struct net_icmp_ping_params params;
-
 	struct net_if *iface = net_if_get_default();
 	struct sockaddr_in dst_addr;
 	net_addr_pton(AF_INET, ipv4_addr, &dst_addr.sin_addr);
@@ -80,7 +80,7 @@ void ping(char* ipv4_addr, uint8_t count)
 	for (int i = 0; i < count; i++)
 	{
 		cycles = k_cycle_get_32();
-		ret = net_icmp_send_echo_request(&icmp_context, iface, &dst_addr, NULL, &cycles);
+		ret = net_icmp_send_echo_request(&icmp_context, iface, (struct sockaddr *)&dst_addr, NULL, &cycles);
 		if (ret != 0) {
 			printk("Failed to send ping, err: %d", ret);
 		}
@@ -122,7 +122,10 @@ static int wifi_connect()
 	printk("Connection succeeded.\n");
 
 	// Ping Google DNS 4 times
-    // ping("8.8.8.8", 4);
+	printk("Pinging 8.8.8.8 to demonstrate connection:\n");
+    ping("8.8.8.8", 4);
+
+	printk("Now performing http GET request to google.com...\n");
 
 	static struct addrinfo hints;
 	struct addrinfo *res;
@@ -137,8 +140,6 @@ static int wifi_connect()
 		return 0;
 	}
 	printk("getaddrinfo status: %d\n", st);
-
-    printk("\nConnecting to HTTP Server:\n");	
 
 	dump_addrinfo(res);
 
@@ -162,8 +163,11 @@ static int wifi_connect()
 
 	printk("Response:\n\n");
 
+	int recv_count = 0;
+
 	while (1) {
 		int len = recv(sock, response, sizeof(response) - 1, 0);
+		recv_count++;
 
 		if (len < 0) {
 			printk("Error reading response\n");
@@ -177,6 +181,8 @@ static int wifi_connect()
 		response[len] = 0;
 		printk("%s", response);
 	}
+
+	printk("Received a total of %d responses\n", recv_count);
 
 	printk("\nClose socket\n");
 
