@@ -24,90 +24,15 @@
 #define CHECK(r) { if (r < 0) { printf("Error: %d\n", (int)r); exit(1); } }
 
 /* HTTP server to connect to */
-#define HTTP_PORT "80"
-
 const char HTTP_HOSTNAME[] = "google.com";
 const char HTTP_PATH[] = "/";
 const char JSON_HOSTNAME[] = "jsonplaceholder.typicode.com";
 const char JSON_GET_PATH[] = "/todos/1";
 const char JSON_POST_PATH[] = "/posts";
 
-static K_SEM_DEFINE(http_response_complete, 0, 1);
 static K_SEM_DEFINE(json_response_complete, 0, 1);
 
 static char response_buffer[1024];
-
-void http_response_cb(struct http_response *rsp,
-	enum http_final_call final_data,
-	void *user_data)
-{
-	printk("HTTP Callback: %.*s", rsp->data_len, rsp->recv_buf);
-
-	if (HTTP_DATA_FINAL == final_data){
-		printk("\n");
-		k_sem_give(&http_response_complete);
-	}
-}
-
-void http_get_example()
-{
-	static struct addrinfo hints;
-	struct addrinfo *res;
-	int st, sock;
-
-	printk("Looking up IP addresses:\n");
-    hints.ai_family = AF_UNSPEC;
-	hints.ai_socktype = SOCK_STREAM;
-	st = getaddrinfo(HTTP_HOSTNAME, HTTP_PORT, &hints, &res);
-	if (st != 0) {
-		printk("Unable to resolve address, quitting\n");
-		return;
-	}
-	printk("getaddrinfo status: %d\n", st);
-
-	dump_addrinfo(res);
-
-	sock = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
-	if (sock < 0)
-	{
-		printk("Issue setting up socket: %d\n", sock);
-		return;
-	}
-	printk("sock = %d\n", sock);
-
-	printk("Connecting to server...\n");
-	int connect_result = connect(sock, res->ai_addr, res->ai_addrlen);
-	if (connect_result != 0)
-	{
-		printk("Issue during connect: %d\n", sock);
-		return;
-	}
-
-	printk("Connected. Making HTTP request...\n");
-
-	struct http_request req = { 0 };
-	int ret;
-
-	req.method = HTTP_GET;
-	req.host = HTTP_HOSTNAME;
-	req.url = HTTP_PATH;
-	req.protocol = "HTTP/1.1";
-	req.response = http_response_cb;
-	req.recv_buf = response_buffer;
-	req.recv_buf_len = sizeof(response_buffer);
-
-	/* sock is a file descriptor referencing a socket that has been connected
-	* to the HTTP server.
-	*/
-	ret = http_client_req(sock, &req, 5000, NULL);
-	printk("HTTP Client Request returned: %d\n", ret);
-
-	k_sem_take(&http_response_complete, K_FOREVER);
-
-	printk("\nClose socket\n");
-
-	(void)close(sock);
-}
 
 void json_response_cb(struct http_response *rsp,
 	enum http_final_call final_data,
@@ -220,7 +145,7 @@ int main(void)
 
 	printk("Now performing http GET request to google.com...\n");
 
-	http_get_example();
+	http_get_example(HTTP_HOSTNAME, HTTP_PATH);
 	
 	json_get_example();
 
