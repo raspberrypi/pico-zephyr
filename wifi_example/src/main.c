@@ -25,13 +25,16 @@
 #define HTTP_PATH "/"
 #define REQUEST "GET " HTTP_PATH " HTTP/1.1\r\nHost: " HTTP_HOST "\r\n\r\n"
 
+static K_SEM_DEFINE(json_response_complete, 0, 1);
+
 #define WIFI_SSID "my_ssid"
 #define WIFI_PSK  "my_password"
 
 const char JSON_HOSTNAME[] = "jsonplaceholder.typicode.com";
-const char JSON_PATH[] = "/todos/1";
+const char JSON_GET_PATH[] = "/todos/1";
+const char JSON_POST_PATH[] = "/posts";
 
-static char response[1024];
+static char response_buffer[1024];
 
 void dump_addrinfo(const struct addrinfo *ai)
 {
@@ -168,7 +171,7 @@ void http_get_example()
 	int recv_count = 0;
 
 	while (1) {
-		int len = recv(sock, response, sizeof(response) - 1, 0);
+		int len = recv(sock, response_buffer, sizeof(response_buffer) - 1, 0);
 		recv_count++;
 
 		if (len < 0) {
@@ -180,8 +183,8 @@ void http_get_example()
 			break;
 		}
 
-		response[len] = 0;
-		printk("%s", response);
+		response_buffer[len] = 0;
+		printk("%s", response_buffer);
 	}
 
 	printk("Received a total of %d responses\n", recv_count);
@@ -196,6 +199,10 @@ void json_response_cb(struct http_response *rsp,
 	void *user_data)
 {
 	printk("%.*s", rsp->data_len, rsp->recv_buf);
+
+	if (HTTP_DATA_FINAL == final_data){
+		k_sem_give(&json_response_complete);
+	}
 }
 
 void json_get_example()
@@ -232,22 +239,51 @@ void json_get_example()
 		return;
 	}
 
+	printk("Get JSON Payload...\n");
+
 	struct http_request req = { 0 };
-	static uint8_t recv_buf[512];
 	int ret;
 
 	req.method = HTTP_GET;
-	req.url = JSON_PATH;
+	req.url = JSON_GET_PATH;
 	req.host = JSON_HOSTNAME;
 	req.protocol = "HTTP/1.1";
 	req.response = json_response_cb;
-	req.recv_buf = recv_buf;
-	req.recv_buf_len = sizeof(recv_buf);
+	req.recv_buf = response_buffer;
+	req.recv_buf_len = sizeof(response_buffer);
 
 	/* sock is a file descriptor referencing a socket that has been connected
 	* to the HTTP server.
 	*/
 	ret = http_client_req(sock, &req, 5000, NULL);
+	printk("HTTP Client Request returned: %d\n", ret);
+
+	k_sem_take(&json_response_complete, K_FOREVER);
+
+	printk("JSON Response complete\n");
+
+	printk("Post JSON Payload...\n");
+
+	const char * json_header[] = { "Content-Type: application/json\r\n", NULL };
+	const char json_post_payload[] = "{\"title\": \"RPi\", \"body\": \"Pico\", \"userId\": 199}";
+
+	req.method = HTTP_POST;
+	req.url = JSON_POST_PATH;
+	req.host = JSON_HOSTNAME;
+	req.header_fields = json_header;
+	req.protocol = "HTTP/1.1";
+	req.response = json_response_cb;
+	req.payload = json_post_payload;
+	req.payload_len = strlen(json_post_payload);
+	req.recv_buf = response_buffer;
+	req.recv_buf_len = sizeof(response_buffer);
+
+	ret = http_client_req(sock, &req, 5000, NULL);
+	printk("HTTP Client Request returned: %d\n", ret);
+
+	k_sem_take(&json_response_complete, K_FOREVER);
+
+	printk("JSON Response complete\n");
 
 	(void)close(sock);
 }
@@ -264,7 +300,7 @@ int main(void)
 
 	printk("Now performing http GET request to google.com...\n");
 
-	http_get_example();
+	// http_get_example();
 	
 	json_get_example();
 
