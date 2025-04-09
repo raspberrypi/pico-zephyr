@@ -28,7 +28,7 @@ static char response_buffer[2048];
 char json_payload_buffer[128];
 
 // Keeps track of JSON parsing result
-static struct placeholder_post * returned_placeholder_post = NULL;
+static struct json_example_object * returned_placeholder_post = NULL;
 static int json_parse_result = -1;
 
 // void http_get(const char * hostname, const char * path);
@@ -133,8 +133,8 @@ static void json_response_cb(struct http_response *rsp,
 			json_parse_result = json_obj_parse(
 				rsp->body_frag_start,
 				rsp->body_frag_len,
-				placeholder_post_descr,
-				ARRAY_SIZE(placeholder_post_descr),
+				json_example_object_descr,
+				ARRAY_SIZE(json_example_object_descr),
 				returned_placeholder_post
 			);
 
@@ -161,7 +161,7 @@ static void json_response_cb(struct http_response *rsp,
 	}
 }
 
-int json_get_example(const char * hostname, const char * path, struct placeholder_post * result)
+int json_get_example(const char * hostname, const char * path, struct json_example_object * result)
 {
 	json_parse_result = -1;
 	returned_placeholder_post = result;
@@ -208,7 +208,7 @@ int json_get_example(const char * hostname, const char * path, struct placeholde
 	return json_parse_result;
 }
 
-int json_post_example(const char * hostname, const char * path, struct placeholder_new_post * payload, struct placeholder_post * result)
+int json_post_example(const char * hostname, const char * path, struct json_example_payload * payload, struct json_example_object * result)
 {
 	json_parse_result = -1;
 	returned_placeholder_post = result;
@@ -224,8 +224,8 @@ int json_post_example(const char * hostname, const char * path, struct placehold
 
 	// Parse the JSON object into a buffer
 	int required_buffer_len = json_calc_encoded_len(
-		placeholder_create_new_post_descr,
-		ARRAY_SIZE(placeholder_create_new_post_descr),
+		json_example_payload_descr,
+		ARRAY_SIZE(json_example_payload_descr),
 		payload
 	);
 	if (required_buffer_len > sizeof(json_payload_buffer))
@@ -235,8 +235,8 @@ int json_post_example(const char * hostname, const char * path, struct placehold
 	}
 
 	int encode_status = json_obj_encode_buf(
-		placeholder_create_new_post_descr,
-		ARRAY_SIZE(placeholder_create_new_post_descr),
+		json_example_payload_descr,
+		ARRAY_SIZE(json_example_payload_descr),
 		payload,
 		json_payload_buffer,
 		sizeof(json_payload_buffer)
@@ -247,7 +247,7 @@ int json_post_example(const char * hostname, const char * path, struct placehold
 		return -1;
 	}
 
-	LOG_ERR("%s", json_payload_buffer);
+	LOG_DBG("%s", json_payload_buffer);
 
     struct http_request req = { 0 };
 	int ret;

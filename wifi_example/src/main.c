@@ -21,8 +21,6 @@ const char HTTP_PATH[] = "/";
 const char JSON_HOSTNAME[] = "jsonplaceholder.typicode.com";
 const char JSON_GET_PATH[] = "/posts/1";
 const char JSON_POST_PATH[] = "/posts";
-const char json_post_payload[] = "{\"title\": \"RPi\", \"body\": \"Pico\", \"userId\": 199}";
-
 
 int main(void)
 {
@@ -35,12 +33,11 @@ int main(void)
     ping("8.8.8.8", 4);
 
 	printk("Now performing http GET request to google.com...\n");
-
 	http_get_example(HTTP_HOSTNAME, HTTP_PATH);
 	k_sleep(K_SECONDS(1));
 
-	struct placeholder_post get_post_result;
-	
+	// Using https://jsonplaceholder.typicode.com/ to demonstrate GET and POST requests with JSON
+	struct json_example_object get_post_result;
 	int json_get_status = json_get_example(JSON_HOSTNAME, JSON_GET_PATH, &get_post_result);
 	if (json_get_status < 0)
 	{
@@ -54,8 +51,8 @@ int main(void)
 	}
 	k_sleep(K_SECONDS(1));
 
-	struct placeholder_post new_post_result;
-	struct placeholder_new_post new_post = { 
+	struct json_example_object new_post_result;
+	struct json_example_payload new_post = { 
 		.body = "RPi",
 		.title = "Pico",
 		.userId = 199
