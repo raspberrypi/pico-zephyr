@@ -23,7 +23,7 @@
 					"auto",
 					"-b",
 					"rpi_pico",
-					"app",
+					"${input:application}",
 					"${input:usb_serial_port}",
 					"--",
 					"-DOPENOCD=${input:openocd_install_dir}/openocd.exe",
@@ -39,7 +39,55 @@
 				"auto",
 				"-b",
 				"rpi_pico",
-                "app",
+                "${input:application}",
+				"${input:usb_serial_port}",
+				"--",
+				"-DOPENOCD=${input:openocd_install_dir}/src/openocd",
+				"-DOPENOCD_DEFAULT_PATH=${input:openocd_install_dir}/tcl"
+			],
+			"problemMatcher": [
+				"$gcc"
+			]
+		},
+		{
+			"label": "Zephyr Build RP2040_W",
+			"type": "shell",
+			"group": {
+				"kind": "build"
+			},
+			"options": {
+				"env": {
+					"SNIPPET_ROOT": "${workspaceFolder}"
+				}
+			},
+			"linux": {
+				"command": "${workspaceFolder}/.venv/bin/west"
+			},
+			"windows": {
+				"command": "\"${workspaceFolder}\"/.venv/Scripts/west.exe",
+				"args": [
+					"build",
+					"-p",
+					"auto",
+					"-b",
+					"rpi_pico/rp2040/w",
+					"${input:application}",
+					"${input:usb_serial_port}",
+					"--",
+					"-DOPENOCD=${input:openocd_install_dir}/openocd.exe",
+					"-DOPENOCD_DEFAULT_PATH=${input:openocd_install_dir}/scripts"
+				],
+			},
+			"osx": {
+				"command": "${workspaceFolder}/.venv/bin/west"
+			},
+			"args": [
+				"build",
+				"-p",
+				"auto",
+				"-b",
+				"rpi_pico/rp2040/w",
+                "${input:application}",
 				"${input:usb_serial_port}",
 				"--",
 				"-DOPENOCD=${input:openocd_install_dir}/src/openocd",
@@ -71,7 +119,7 @@
 					"auto",
 					"-b",
 					"rpi_pico2/rp2350a/m33",
-					"app",
+					"${input:application}",
 					"${input:usb_serial_port}",
 					"--",
 					"-DOPENOCD=${input:openocd_install_dir}/openocd.exe",
@@ -87,7 +135,7 @@
 				"auto",
 				"-b",
 				"rpi_pico2/rp2350a/m33",
-                "app",
+                "${input:application}",
 				"${input:usb_serial_port}",
 				"--",
 				"-DOPENOCD=${input:openocd_install_dir}/src/openocd",
@@ -118,6 +166,12 @@
 		}
 	],
 	"inputs": [
+	{
+		"id": "application",
+		"type": "promptString",
+		"description": "Application to build, e.g app",
+		"default": "app"
+		},
     {
       "id": "openocd_install_dir",
       "type": "promptString",
