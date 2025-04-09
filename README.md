@@ -78,6 +78,7 @@ This will install VSCode and the [Cortex-Debug](https://marketplace.visualstudio
 Open this folder in VSCode. You can run `code .` from the command line.
 
 To build, press `Ctrl+Shift+B` and select either `Zephyr Build RP2040` or `Zephyr Build RP2350` for the chip you are targetting.
+Select `app`.
 Select between the UART or USB for serial output.
 Note that when switching between UART and USB serial, it may be necessary to delete the build directory for this change to take effect.
 Press `Enter` to confirm the OpenOCD path or change it to the directory where OpenOCD is installed.
@@ -140,3 +141,28 @@ Press `Enter` to confirm the OpenOCD path or change it to the directory where Op
 
 VSCode will then enter the debugging view starting in `main`, where you can step over each instruction and inspect the source code.
 Further debugging instructions can be found [here](https://code.visualstudio.com/docs/debugtest/debugging#_debug-actions).
+
+# More Examples
+
+## Wifi Example
+
+The `wifi_example` connects to a Wi-Fi network, pings `8.8.8.8`, and performs HTTP GET and POST requests with JSON.
+
+To begin, create a file in `wifi_example/src/` called `wifi_info.h` and add the SSID and PSK for the Wi-Fi network:
+
+> [!CAUTION]
+> NEVER COMMIT OR SHARE THIS FILE PUBLICLY - This could be a big security issue and is for demonstration purposes only
+
+```c
+// wifi_example/src/wifi_info.h
+#define WIFI_SSID "MySSID"
+#define WIFI_PSK  "my_password"
+```
+
+Then build (currently only supports Pico W):
+
+```bash
+./build_rp2040_w.sh wifi_example
+```
+
+Or to build using VSCode, press `Ctrl+Shift+B` and select `Zephyr Build RP2040_W`, then enter `wifi_example` for the application option before continuing with the other steps.
