@@ -3,10 +3,12 @@
  */
 
 #include <zephyr/kernel.h>
+#include <zephyr/logging/log.h>
 #include <errno.h>
 
 // Local includes
 #include "http.h"
+#include "json_definitions.h"
 #include "ping.h"
 #include "wifi.h"
 #include "wifi_info.h"
@@ -35,8 +37,20 @@ int main(void)
 
 	http_get_example(HTTP_HOSTNAME, HTTP_PATH);
 	k_sleep(K_SECONDS(1));
+
+	struct placeholder_post new_post_result;
 	
-	json_get_example(JSON_HOSTNAME, JSON_GET_PATH);
+	int json_get_status = json_get_example(JSON_HOSTNAME, JSON_GET_PATH, &new_post_result);
+	if (json_get_status < 0)
+	{
+		LOG_ERR("Error in json_get_example");
+	} else {
+		printk("Got JSON result:\n");
+		printk("Title: %s\n", new_post_result.title);
+		printk("Body: %s\n", new_post_result.body);
+		printk("User ID: %d\n", new_post_result.id);
+		printk("ID: %d\n", new_post_result.userId);
+	}
 	k_sleep(K_SECONDS(1));
 
 	json_post_example(JSON_HOSTNAME, JSON_POST_PATH, json_post_payload);

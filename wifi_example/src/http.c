@@ -12,6 +12,8 @@
 #include <zephyr/net/wifi_mgmt.h>
 #include <zephyr/posix/netdb.h>
 
+#include "json_definitions.h"
+
 LOG_MODULE_REGISTER(http);
 
 #define HTTP_PORT "80"
@@ -19,7 +21,13 @@ LOG_MODULE_REGISTER(http);
 static K_SEM_DEFINE(json_response_complete, 0, 1);
 static K_SEM_DEFINE(http_response_complete, 0, 1);
 static const char * json_post_headers[] = { "Content-Type: application/json\r\n", NULL };
+
+// Holds the HTTP response
 static char response_buffer[2048];
+
+// Keeps track of JSON parsing result
+static struct placeholder_post * returned_placeholder_post = NULL;
+static int json_parse_result = -1;
 
 // void http_get(const char * hostname, const char * path);
 
@@ -107,20 +115,6 @@ void http_get_example(const char * hostname, const char * path)
 	(void)close(sock);
 }
 
-struct placeholder_post {
-	const char *title;
-	const char *body;
-	int id;
-	int userId;
-};
-
-static const struct json_obj_descr placeholder_post_descr[] = {
-	JSON_OBJ_DESCR_PRIM(struct placeholder_post, title, JSON_TOK_STRING),
-	JSON_OBJ_DESCR_PRIM(struct placeholder_post, body, JSON_TOK_STRING),
-	JSON_OBJ_DESCR_PRIM(struct placeholder_post, id, JSON_TOK_NUMBER),
-	JSON_OBJ_DESCR_PRIM(struct placeholder_post, userId, JSON_TOK_NUMBER),
-};
-
 static void json_response_cb(struct http_response *rsp,
 	enum http_final_call final_data,
 	void *user_data)
@@ -129,29 +123,33 @@ static void json_response_cb(struct http_response *rsp,
 
 	if (rsp->body_found)
 	{
-		printk("Body\n");
+		printk("Body:\n");
 		printk("%.*s", rsp->body_frag_len, rsp->body_frag_start);
 
-		struct placeholder_post p;
-		int ret = json_obj_parse(
-			rsp->body_frag_start,
-			rsp->body_frag_len,
-			placeholder_post_descr,
-			ARRAY_SIZE(placeholder_post_descr),
-			&p
-		);
+		if (returned_placeholder_post != NULL)
+		{
+			json_parse_result = json_obj_parse(
+				rsp->body_frag_start,
+				rsp->body_frag_len,
+				placeholder_post_descr,
+				ARRAY_SIZE(placeholder_post_descr),
+				returned_placeholder_post
+			);
 
-		if (ret < 0)
-		{
-			LOG_ERR("JSON Parse Error: %d", ret);
-		}
-		else
-		{
-			LOG_INF("json_obj_parse return code: %d", ret);
-			LOG_INF("Title: %s", p.title);
-			LOG_INF("Body: %s", p.body);
-			LOG_INF("User ID: %d", p.id);
-			LOG_INF("ID: %d", p.userId);
+			if (json_parse_result < 0)
+			{
+				LOG_ERR("JSON Parse Error: %d", json_parse_result);
+			}
+			else
+			{
+				LOG_DBG("json_obj_parse return code: %d", json_parse_result);
+				LOG_DBG("Title: %s", returned_placeholder_post->title);
+				LOG_DBG("Body: %s", returned_placeholder_post->body);
+				LOG_DBG("User ID: %d", returned_placeholder_post->id);
+				LOG_DBG("ID: %d", returned_placeholder_post->userId);
+			}
+		} else {
+			LOG_ERR("No pointer passed to copy JSON GET result to");
 		}
 	}
 
@@ -161,13 +159,16 @@ static void json_response_cb(struct http_response *rsp,
 	}
 }
 
-void json_get_example(const char * hostname, const char * path)
+int json_get_example(const char * hostname, const char * path, struct placeholder_post * post)
 {
+	json_parse_result = -1;
+	returned_placeholder_post = post;
+
 	int sock = connect_socket(hostname);
 	if (sock < 0)
 	{
 		printk("Issue setting up socket: %d\n", sock);
-		return;
+		return -1;
 	}
 
 	printk("Connected. Get JSON Payload...\n");
@@ -188,6 +189,11 @@ void json_get_example(const char * hostname, const char * path)
 	*/
 	ret = http_client_req(sock, &req, 5000, NULL);
 	printk("HTTP Client Request returned: %d\n", ret);
+	if (ret < 0)
+	{
+		LOG_ERR("Error sending HTTP Client Request");
+		return -1;
+	}
 
 	k_sem_take(&json_response_complete, K_FOREVER);
 
@@ -196,6 +202,8 @@ void json_get_example(const char * hostname, const char * path)
 	printk("Close socket\n");
 
 	(void)close(sock);
+
+	return json_parse_result;
 }
 
 void json_post_example(const char * hostname, const char * path, const char * payload)
