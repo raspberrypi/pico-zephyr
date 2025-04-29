@@ -16,19 +16,7 @@
 				"command": "${workspaceFolder}/.venv/bin/west"
 			},
 			"windows": {
-				"command": "\"${workspaceFolder}\"/.venv/Scripts/west.exe",
-				"args": [
-					"build",
-					"-p",
-					"auto",
-					"-b",
-					"rpi_pico",
-					"${input:application}",
-					"${input:usb_serial_port}",
-					"--",
-					"-DOPENOCD=${input:openocd_install_dir}/openocd.exe",
-					"-DOPENOCD_DEFAULT_PATH=${input:openocd_install_dir}/scripts"
-				],
+				"command": "\"${workspaceFolder}\"/.venv/Scripts/west.exe"
 			},
 			"osx": {
 				"command": "${workspaceFolder}/.venv/bin/west"
@@ -42,8 +30,8 @@
                 "${input:application}",
 				"${input:usb_serial_port}",
 				"--",
-				"-DOPENOCD=${input:openocd_install_dir}/src/openocd",
-				"-DOPENOCD_DEFAULT_PATH=${input:openocd_install_dir}/tcl"
+				"-DOPENOCD=${input:openocd_install_dir}/openocd.exe",
+				"-DOPENOCD_DEFAULT_PATH=${input:openocd_install_dir}/scripts"
 			],
 			"problemMatcher": [
 				"$gcc"
@@ -64,19 +52,7 @@
 				"command": "${workspaceFolder}/.venv/bin/west"
 			},
 			"windows": {
-				"command": "\"${workspaceFolder}\"/.venv/Scripts/west.exe",
-				"args": [
-					"build",
-					"-p",
-					"auto",
-					"-b",
-					"rpi_pico/rp2040/w",
-					"${input:application}",
-					"${input:usb_serial_port}",
-					"--",
-					"-DOPENOCD=${input:openocd_install_dir}/openocd.exe",
-					"-DOPENOCD_DEFAULT_PATH=${input:openocd_install_dir}/scripts"
-				],
+				"command": "\"${workspaceFolder}\"/.venv/Scripts/west.exe"
 			},
 			"osx": {
 				"command": "${workspaceFolder}/.venv/bin/west"
@@ -90,8 +66,8 @@
                 "${input:application}",
 				"${input:usb_serial_port}",
 				"--",
-				"-DOPENOCD=${input:openocd_install_dir}/src/openocd",
-				"-DOPENOCD_DEFAULT_PATH=${input:openocd_install_dir}/tcl"
+				"-DOPENOCD=${input:openocd_install_dir}/openocd.exe",
+				"-DOPENOCD_DEFAULT_PATH=${input:openocd_install_dir}/scripts"
 			],
 			"problemMatcher": [
 				"$gcc"
@@ -112,19 +88,7 @@
 				"command": "${workspaceFolder}/.venv/bin/west"
 			},
 			"windows": {
-				"command": "\"${workspaceFolder}\"/.venv/Scripts/west.exe",
-				"args": [
-					"build",
-					"-p",
-					"auto",
-					"-b",
-					"rpi_pico2/rp2350a/m33",
-					"${input:application}",
-					"${input:usb_serial_port}",
-					"--",
-					"-DOPENOCD=${input:openocd_install_dir}/openocd.exe",
-					"-DOPENOCD_DEFAULT_PATH=${input:openocd_install_dir}/scripts"
-				],
+				"command": "\"${workspaceFolder}\"/.venv/Scripts/west.exe"
 			},
 			"osx": {
 				"command": "${workspaceFolder}/.venv/Scripts/west"
@@ -138,8 +102,8 @@
                 "${input:application}",
 				"${input:usb_serial_port}",
 				"--",
-				"-DOPENOCD=${input:openocd_install_dir}/src/openocd",
-				"-DOPENOCD_DEFAULT_PATH=${input:openocd_install_dir}/tcl"
+				"-DOPENOCD=${input:openocd_install_dir}/openocd.exe",
+				"-DOPENOCD_DEFAULT_PATH=${input:openocd_install_dir}/scripts"
 			],
 			"problemMatcher": [
 				"$gcc"
@@ -176,7 +140,7 @@
       "id": "openocd_install_dir",
       "type": "promptString",
       "description": "Top level openocd install directory, e.g /home/openocd",
-	  "default": "${workspaceFolder}/../openocd"
+	  "default": "${userHome}/.pico-sdk/openocd/0.12.0+dev"
     },
 	{
 		"id": "usb_serial_port",

@@ -7,12 +7,8 @@
             "request": "launch",
             "type": "cortex-debug",
             "servertype": "openocd",
-            "serverpath": "${input:openocd_install_dir}/src/openocd",
-            "searchDir": ["${input:openocd_install_dir}/tcl"],
-            "windows": {
-				"serverpath": "${input:openocd_install_dir}/openocd.exe",
-                "searchDir": ["${input:openocd_install_dir}/scripts"]
-			},
+            "serverpath": "${userHome}/.pico-sdk/openocd/0.12.0+dev/openocd.exe",
+            "searchDir": ["${userHome}/.pico-sdk/openocd/0.12.0+dev/scripts"],
             "toolchainPrefix": "arm-zephyr-eabi",
             "armToolchainPath": "${userHome}/zephyr-sdk-0.17.0/arm-zephyr-eabi/bin",
             "device": "RP2350",
@@ -33,12 +29,8 @@
             "request": "launch",
             "type": "cortex-debug",
             "servertype": "openocd",
-            "serverpath": "${input:openocd_install_dir}/src/openocd",
-            "searchDir": ["${input:openocd_install_dir}/tcl"],
-            "windows": {
-				"serverpath": "${input:openocd_install_dir}/openocd.exe",
-                "searchDir": ["${input:openocd_install_dir}/scripts"]
-			},
+            "serverpath": "${userHome}/.pico-sdk/openocd/0.12.0+dev/openocd.exe",
+            "searchDir": ["${userHome}/.pico-sdk/openocd/0.12.0+dev/scripts"],
             "toolchainPrefix": "arm-zephyr-eabi",
             "armToolchainPath": "${userHome}/zephyr-sdk-0.17.0/arm-zephyr-eabi/bin",
             "device": "RP2040",
@@ -53,13 +45,5 @@
                 "adapter speed 5000"
             ]
         },
-    ],
-    "inputs": [
-        {
-        "id": "openocd_install_dir",
-        "type": "promptString",
-        "description": "Top level openocd install directory, e.g /home/openocd",
-        "default": "${workspaceFolder}/../openocd"
-        }
     ]
 }
