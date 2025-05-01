@@ -30,8 +30,8 @@
                 "${input:application}",
 				"${input:usb_serial_port}",
 				"--",
-				"-DOPENOCD=${input:openocd_install_dir}/openocd.exe",
-				"-DOPENOCD_DEFAULT_PATH=${input:openocd_install_dir}/scripts"
+				"-DOPENOCD=\"${userHome}\"/.pico-sdk/openocd/0.12.0+dev/openocd.exe",
+				"-DOPENOCD_DEFAULT_PATH=\"${userHome}\"/.pico-sdk/openocd/0.12.0+dev/scripts"
 			],
 			"problemMatcher": [
 				"$gcc"
@@ -66,8 +66,8 @@
                 "${input:application}",
 				"${input:usb_serial_port}",
 				"--",
-				"-DOPENOCD=${input:openocd_install_dir}/openocd.exe",
-				"-DOPENOCD_DEFAULT_PATH=${input:openocd_install_dir}/scripts"
+				"-DOPENOCD=\"${userHome}\"/.pico-sdk/openocd/0.12.0+dev/openocd.exe",
+				"-DOPENOCD_DEFAULT_PATH=\"${userHome}\"/.pico-sdk/openocd/0.12.0+dev/scripts"
 			],
 			"problemMatcher": [
 				"$gcc"
@@ -102,8 +102,8 @@
                 "${input:application}",
 				"${input:usb_serial_port}",
 				"--",
-				"-DOPENOCD=${input:openocd_install_dir}/openocd.exe",
-				"-DOPENOCD_DEFAULT_PATH=${input:openocd_install_dir}/scripts"
+				"-DOPENOCD=\"${userHome}\"/.pico-sdk/openocd/0.12.0+dev/openocd.exe",
+				"-DOPENOCD_DEFAULT_PATH=\"${userHome}\"/.pico-sdk/openocd/0.12.0+dev/scripts"
 			],
 			"problemMatcher": [
 				"$gcc"
@@ -135,13 +135,7 @@
 		"type": "promptString",
 		"description": "Application to build, e.g app",
 		"default": "app"
-		},
-    {
-      "id": "openocd_install_dir",
-      "type": "promptString",
-      "description": "Top level openocd install directory, e.g /home/openocd",
-	  "default": "${userHome}/.pico-sdk/openocd/0.12.0+dev"
-    },
+	},
 	{
 		"id": "usb_serial_port",
 		"type": "pickString",
