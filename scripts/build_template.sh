@@ -24,4 +24,4 @@ fi
 . .venv/bin/activate
 echo "Building RPI_PICO_BOARD with command:"
 set -x
-SNIPPET_ROOT="$(pwd)" west build -b RPI_PICO_BOARD $APP -p auto $SNIPPET_USB -- -DOPENOCD=OPENOCD_INSTALL_DIR/openocd -DOPENOCD_DEFAULT_PATH=OPENOCD_INSTALL_DIR/scripts
+SNIPPET_ROOT="$(pwd)" west build -b RPI_PICO_BOARD $APP -p auto $SNIPPET_USB -- -DOPENOCD=OPENOCD_INSTALL_DIR/openocd.exe -DOPENOCD_DEFAULT_PATH=OPENOCD_INSTALL_DIR/scripts
