@@ -2,6 +2,37 @@
 	"version": "2.0.0",
 	"tasks": [
 		{
+            "label": "Compile Project",
+            "type": "shell",
+            "command": "${command:raspberry-pi-pico.getWestPath}",
+            "args":  [
+				"build",
+				"-p",
+				"auto",
+				"-b",
+				"rpi_pico",
+                "${input:application}",
+				"${input:usb_serial_port}",
+				"--",
+				"-DOPENOCD=${command:raspberry-pi-pico.getOpenOCDRoot}/openocd.exe",
+				"-DOPENOCD_DEFAULT_PATH=${command:raspberry-pi-pico.getOpenOCDRoot}/scripts"
+			],
+            "group": {
+				"kind": "build"
+			},
+			"options": {
+				"env": {
+					"ZEPHYR_BASE": "${command:raspberry-pi-pico.getOpenOCDRoot}/../zephyr_workspace/zephyr",
+					"SNIPPET_ROOT": "${workspaceFolder}"
+				}
+			},
+            "presentation": {
+                "reveal": "always",
+                "panel": "dedicated"
+            },
+            "problemMatcher": "$gcc",
+        },
+		{
 			"label": "Zephyr Build RP2040",
 			"type": "shell",
 			"group": {
