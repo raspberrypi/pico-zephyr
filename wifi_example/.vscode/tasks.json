@@ -24,7 +24,7 @@
 			},
 			"options": {
 				"env": {
-					"SNIPPET_ROOT": "${workspaceFolder}"
+					"SNIPPET_ROOT": "${command:raspberry-pi-pico.getZephyrWorkspacePath}/pico-zephyr"
 				},
 				"cwd": "${command:raspberry-pi-pico.getZephyrWorkspacePath}"
 			},
