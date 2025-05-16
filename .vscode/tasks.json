@@ -22,7 +22,6 @@
 			},
 			"options": {
 				"env": {
-					"ZEPHYR_BASE": "${command:raspberry-pi-pico.getOpenOCDRoot}/../zephyr_workspace/zephyr",
 					"SNIPPET_ROOT": "${workspaceFolder}"
 				}
 			},
@@ -32,6 +31,17 @@
             },
             "problemMatcher": "$gcc",
         },
+		{
+			"label": "Flash",
+			"type": "shell",
+			"group": {
+				"kind": "build"
+			},
+			"command": "${command:raspberry-pi-pico.getWestPath}",
+			"args": [
+				"flash"
+			]
+		},
 		{
 			"label": "Zephyr Build RP2040",
 			"type": "shell",
