@@ -11,7 +11,9 @@
 				"auto",
 				"-b",
 				"rpi_pico",
-                "${input:application}",
+				"-d",
+				"\"${workspaceFolder}\"/build",
+                "\"${workspaceFolder}\"",
 				"${input:usb_serial_port}",
 				"--",
 				"-DOPENOCD=${command:raspberry-pi-pico.getOpenOCDRoot}/openocd.exe",
@@ -23,7 +25,8 @@
 			"options": {
 				"env": {
 					"SNIPPET_ROOT": "${workspaceFolder}"
-				}
+				},
+				"cwd": "${command:raspberry-pi-pico.getZephyrWorkspacePath}"
 			},
             "presentation": {
                 "reveal": "always",
@@ -39,8 +42,13 @@
 			},
 			"command": "${command:raspberry-pi-pico.getWestPath}",
 			"args": [
-				"flash"
-			]
+				"flash",
+				"--build-dir",
+				"\"${workspaceFolder}\"/build"
+			],
+			"options": {
+				"cwd": "${command:raspberry-pi-pico.getZephyrWorkspacePath}"
+			},
 		},
 		{
 			"label": "Zephyr Build RP2040",
