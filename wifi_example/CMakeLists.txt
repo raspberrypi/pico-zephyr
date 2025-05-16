@@ -1,4 +1,7 @@
 # SPDX-License-Identifier: Apache-2.0
+# == DO NOT EDIT THE FOLLOWING LINES for the Raspberry Pi Pico VS Code Extension to work ==
+# pico_zephyr
+# =========================================================================================
 
 cmake_minimum_required(VERSION 3.20.0)
 
