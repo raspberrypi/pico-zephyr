@@ -32,7 +32,7 @@
                 "reveal": "always",
                 "panel": "dedicated"
             },
-            "problemMatcher": "$gcc",
+            "problemMatcher": "$gcc"
         },
 		{
 			"label": "Flash",
@@ -48,7 +48,7 @@
 			],
 			"options": {
 				"cwd": "${command:raspberry-pi-pico.getZephyrWorkspacePath}"
-			},
+			}
 		}
 	],
 	"inputs": [
@@ -66,7 +66,7 @@
 		"options": [
 			{"label": "UART", "value": ""},
 			{"label": "USB", "value": "-S usb_serial_port"}
-      ],
+      ]
 	}
   ]
 }
