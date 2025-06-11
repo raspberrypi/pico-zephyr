@@ -10,7 +10,7 @@
             "serverpath": "${command:raspberry-pi-pico.getOpenOCDRoot}/openocd.exe",
             "searchDir": ["${command:raspberry-pi-pico.getOpenOCDRoot}/scripts"],
             "toolchainPrefix": "arm-zephyr-eabi",
-            "armToolchainPath": "${command:raspberry-pi-pico.getZephyrWorkspacePath}/zephyr-sdk-0.17.0/arm-zephyr-eabi/bin",
+            "armToolchainPath": "${command:raspberry-pi-pico.getZephyrWorkspacePath}/zephyr-sdk-0.17.1/arm-zephyr-eabi/bin",
             "device": "RP2350",
             "configFiles": [
                 "interface/cmsis-dap.cfg",
@@ -32,7 +32,7 @@
             "serverpath": "${command:raspberry-pi-pico.getOpenOCDRoot}/openocd.exe",
             "searchDir": ["${command:raspberry-pi-pico.getOpenOCDRoot}/scripts"],
             "toolchainPrefix": "arm-zephyr-eabi",
-            "armToolchainPath": "${command:raspberry-pi-pico.getZephyrWorkspacePath}/zephyr-sdk-0.17.0/arm-zephyr-eabi/bin",
+            "armToolchainPath": "${command:raspberry-pi-pico.getZephyrWorkspacePath}/zephyr-sdk-0.17.1/arm-zephyr-eabi/bin",
             "device": "RP2040",
             "configFiles": [
                 "interface/cmsis-dap.cfg",
