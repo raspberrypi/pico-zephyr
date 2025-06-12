@@ -49,7 +49,25 @@
 			"options": {
 				"cwd": "${command:raspberry-pi-pico.getZephyrWorkspacePath}"
 			}
-		}
+		},
+        {
+            "label": "Run Project",
+            "type": "shell",
+            "command": "${env:HOME}/.pico-sdk/picotool/2.1.1/picotool/picotool",
+            "args": [
+                "load",
+                "\"${workspaceFolder}\"/build/zephyr/zephyr.elf",
+                "-fx"
+            ],
+            "presentation": {
+                "reveal": "always",
+                "panel": "dedicated"
+            },
+            "problemMatcher": [],
+            "windows": {
+                "command": "\"${env:USERPROFILE}\"/.pico-sdk/picotool/2.1.1/picotool/picotool.exe"
+            }
+        }
 	],
 	"inputs": [
 	{
