@@ -1,0 +1,11 @@
+{
+    "terminal.integrated.env.windows": {
+        "PATH": "${env:USERPROFILE}/.pico-sdk/cmake/v3.31.5/bin;${env:USERPROFILE}/.pico-sdk/dtc/bin;${env:USERPROFILE}/.pico-sdk/gperf/bin;${env:USERPROFILE}/.pico-sdk/ninja/v1.12.1;${env:USERPROFILE}/.pico-sdk/python/3.12.6;${env:USERPROFILE}/.pico-sdk/wget;C:/Program Files/7-Zip;C:\\Program Files\\Git\\cmd\\git.EXE;${env:PATH}"
+    },
+    "terminal.integrated.env.osx": {
+        "PATH": "{${env:HOME}/.pico-sdk/cmake/v3.31.5/bin:${env:HOME}/.pico-sdk/dtc/bin:${env:HOME}/.pico-sdk/gperf/bin:${env:HOME}/.pico-sdk/ninja/v1.12.1:${env:HOME}/.pico-sdk/python/3.12.6:${env:HOME}/.pico-sdk/wget:/usr/bin/git:${env:PATH}"
+    },
+    "terminal.integrated.env.linux": {
+        "PATH": "${env:HOME}/.pico-sdk/cmake/v3.31.5/bin:${env:HOME}/.pico-sdk/dtc/bin:${env:HOME}/.pico-sdk/gperf/bin:${env:HOME}/.pico-sdk/ninja/v1.12.1:${env:HOME}/.pico-sdk/python/3.12.6:${env:HOME}/.pico-sdk/wget:/usr/bin/git:${env:PATH}"
+    }
+}
