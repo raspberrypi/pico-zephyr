@@ -32,7 +32,17 @@
                 "reveal": "always",
                 "panel": "dedicated"
             },
-            "problemMatcher": "$gcc"
+            "problemMatcher": "$gcc",
+			"windows": {
+                "options": {
+                    "shell": {
+                        "executable": "cmd.exe",
+                        "args": [
+                            "/d", "/c"
+                        ]
+                    }
+                }
+            }
         },
 		{
 			"label": "Flash",
