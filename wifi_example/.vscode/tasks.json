@@ -1,0 +1,100 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+            "label": "Compile Project",
+            "type": "shell",
+            "command": "${command:raspberry-pi-pico.getWestPath}",
+            "args":  [
+				"build",
+				"-p",
+				"auto",
+				"-b",
+				"rpi_pico",
+				"-d",
+				"\"${workspaceFolder}\"/build",
+                "\"${workspaceFolder}\"",
+				"${input:usb_serial_port}",
+				"--",
+				"-DOPENOCD=${command:raspberry-pi-pico.getOpenOCDRoot}/openocd.exe",
+				"-DOPENOCD_DEFAULT_PATH=${command:raspberry-pi-pico.getOpenOCDRoot}/scripts"
+			],
+            "group": {
+				"kind": "build"
+			},
+			"options": {
+				"env": {
+					"SNIPPET_ROOT": "${command:raspberry-pi-pico.getZephyrWorkspacePath}/pico-zephyr"
+				},
+				"cwd": "${command:raspberry-pi-pico.getZephyrWorkspacePath}"
+			},
+            "presentation": {
+                "reveal": "always",
+                "panel": "dedicated"
+            },
+            "problemMatcher": "$gcc",
+			"windows": {
+                "options": {
+                    "shell": {
+                        "executable": "cmd.exe",
+                        "args": [
+                            "/d", "/c"
+                        ]
+                    }
+                }
+            }
+        },
+		{
+			"label": "Flash",
+			"type": "shell",
+			"group": {
+				"kind": "build"
+			},
+			"command": "${command:raspberry-pi-pico.getWestPath}",
+			"args": [
+				"flash",
+				"--build-dir",
+				"\"${workspaceFolder}\"/build"
+			],
+			"options": {
+				"cwd": "${command:raspberry-pi-pico.getZephyrWorkspacePath}"
+			}
+		},
+        {
+            "label": "Run Project",
+            "type": "shell",
+            "command": "${env:HOME}/.pico-sdk/picotool/2.1.1/picotool/picotool",
+            "args": [
+                "load",
+                "\"${workspaceFolder}\"/build/zephyr/zephyr.elf",
+                "-fx"
+            ],
+            "presentation": {
+                "reveal": "always",
+                "panel": "dedicated"
+            },
+            "problemMatcher": [],
+            "windows": {
+                "command": "\"${env:USERPROFILE}\"/.pico-sdk/picotool/2.1.1/picotool/picotool.exe"
+            }
+        }
+	],
+	"inputs": [
+	{
+		"id": "application",
+		"type": "promptString",
+		"description": "Application to build, e.g app",
+		"default": "app"
+	},
+	{
+		"id": "usb_serial_port",
+		"type": "pickString",
+		"description": "Select whether to use the UART serial port or the USB serial port",
+		"default": "",
+		"options": [
+			{"label": "UART", "value": ""},
+			{"label": "USB", "value": "-S usb_serial_port"}
+      ]
+	}
+  ]
+}
