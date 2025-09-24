@@ -6,15 +6,15 @@ usage() {
   cat <<EOF
 Usage: $(basename "$0") [-b <board>] [-a <app_dir>] [-s] [-- clean]
   -b BOARD   Zephyr board (e.g. rpi_pico, rpi_pico/rp2040/w, rpi_pico2/rp2350a/m33)
-  -a APP     Application directory (default: app)
+  -p PROJECT Project directory (default: app)
   -s         Enable snippet: usb_serial_port
   -- clean   Clean build directory before building
 
 Examples:
   $(basename "$0") -b rpi_pico
-  $(basename "$0") -b rpi_pico2/rp2350a/m33 -a samples/blinky -s
+  $(basename "$0") -b rpi_pico2/rp2350a/m33 -p blinky -s
 
-Artifacts: <app>/build
+Artifacts: <project>/build
 Workspace used (cwd): \$(zephyr_ws_dir)
 EOF
 }

@@ -10,7 +10,7 @@ URL="https://github.com/raspberrypi/pico-sdk-tools/releases/download/${RELEASE}/
 OUT_DIR="$HOME/.pico-sdk/openocd/${VERSION}"
 
 info "Preparing OpenOCD for Linux (${VERSION}, aarch64)"
-ensure_pkg wget tar
+ensure_pkg wget tar libhidapi-hidraw0
 
 mkdir -p "$OUT_DIR"
 cd "$(dirname "$0")"

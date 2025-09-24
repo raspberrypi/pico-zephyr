@@ -16,12 +16,6 @@
 ./scripts/setup_openocd_linux.sh
 ```
 
-# Windows OpenOCD (PowerShell)
-
-```
-pwsh -File scripts/setup_openocd_windows.ps1
-```
-
 # VS Code + Pico extension
 
 ```

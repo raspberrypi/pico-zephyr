@@ -7,7 +7,7 @@
 #
 # Flags:
 #   --full           Use full Zephyr SDK/toolchains (default: minimal/arm-only)
-#   --no-vscode      Skip VS Code install
+#   --vscode         Add VS Code install
 #   --no-openocd     Skip OpenOCD install
 #   --sdk-release X  Pico SDK tools tag for OpenOCD (default: v2.2.0-2)
 #   --ocd-version V  OpenOCD version dir (default: 0.12.0+dev)
@@ -21,7 +21,7 @@ REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 . "$SCRIPT_DIR/_lib.sh"
 
 USE_FULL=0
-DO_VSCODE=1
+DO_VSCODE=0
 DO_OPENOCD=1
 SDK_RELEASE="v2.2.0-2"
 OCD_VERSION="0.12.0+dev"
@@ -33,7 +33,7 @@ usage() {
 while (( "$#" )); do
   case "$1" in
     --full) USE_FULL=1; shift ;;
-    --no-vscode) DO_VSCODE=0; shift ;;
+    --vscode) DO_VSCODE=1; shift ;;
     --no-openocd) DO_OPENOCD=0; shift ;;
     --sdk-release) SDK_RELEASE="${2:-}"; shift 2 ;;
     --ocd-version) OCD_VERSION="${2:-}"; shift 2 ;;
