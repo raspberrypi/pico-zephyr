@@ -300,12 +300,12 @@ pyrightconfig.json
 ### venv ###
 # Virtualenv
 # http://iamzed.com/2009/05/07/a-primer-on-virtualenv/
-[Bb]in
-[Ii]nclude
-[Ll]ib
-[Ll]ib64
-[Ll]ocal
-[Ss]cripts
+#[Bb]in
+#[Ii]nclude
+#Ll]ib
+#[Ll]ib64
+#[Ll]ocal
+#[Ss]cripts
 pyvenv.cfg
 pip-selfcheck.json
 
@@ -355,3 +355,5 @@ $RECYCLE.BIN/
 *.lnk
 
 # End of https://www.toptal.com/developers/gitignore/api/c,cmake,linux,macos,ninja,windows,visualstudiocode,python,venv
+
+#remove scripts include bin lib and lib64 from venv gitignore
