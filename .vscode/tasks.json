@@ -2,167 +2,101 @@
 	"version": "2.0.0",
 	"tasks": [
 		{
-			"label": "Zephyr Build RP2040",
+			"label": "Compile Project",
 			"type": "shell",
-			"group": {
-				"kind": "build"
-			},
-			"options": {
-				"env": {
-					"SNIPPET_ROOT": "${workspaceFolder}"
-				}
-			},
-			"linux": {
-				"command": "${workspaceFolder}/.venv/bin/west"
-			},
-			"windows": {
-				"command": "\"${workspaceFolder}\"/.venv/Scripts/west.exe"
-			},
-			"osx": {
-				"command": "${workspaceFolder}/.venv/bin/west"
-			},
+			"command": "${command:raspberry-pi-pico.getWestPath}",
 			"args": [
 				"build",
 				"-p",
 				"auto",
 				"-b",
-				"rpi_pico",
-                "${input:application}",
+				"rpi_pico2/rp2350a/m33/w",
+				"-d",
+				"\"${workspaceFolder}/${input:application}/build\"",
+				"\"${workspaceFolder}/${input:application}\"",
 				"${input:usb_serial_port}",
 				"--",
-				"-DOPENOCD=\"${userHome}\"/.pico-sdk/openocd/0.12.0+dev/openocd.exe",
-				"-DOPENOCD_DEFAULT_PATH=\"${userHome}\"/.pico-sdk/openocd/0.12.0+dev/scripts"
+				"-DOPENOCD=${command:raspberry-pi-pico.getOpenOCDRoot}/openocd",
+				"-DOPENOCD_DEFAULT_PATH=${command:raspberry-pi-pico.getOpenOCDRoot}/scripts"
 			],
-			"problemMatcher": [
-				"$gcc"
-			]
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			},
+			"presentation": {
+				"reveal": "always",
+				"panel": "dedicated"
+			},
+			"problemMatcher": "$gcc",
+			"options": {
+				"cwd": "${command:raspberry-pi-pico.getZephyrWorkspacePath}"
+			},
+			"windows": {
+				"options": {
+					"shell": {
+						"executable": "cmd.exe",
+						"args": [
+							"/d",
+							"/c"
+						]
+					}
+				}
+			}
 		},
 		{
-			"label": "Zephyr Build RP2040_W",
+			"label": "Flash",
 			"type": "shell",
 			"group": {
 				"kind": "build"
 			},
-			"options": {
-				"env": {
-					"SNIPPET_ROOT": "${workspaceFolder}"
-				}
-			},
-			"linux": {
-				"command": "${workspaceFolder}/.venv/bin/west"
-			},
-			"windows": {
-				"command": "\"${workspaceFolder}\"/.venv/Scripts/west.exe"
-			},
-			"osx": {
-				"command": "${workspaceFolder}/.venv/bin/west"
-			},
+			"command": "${command:raspberry-pi-pico.getWestPath}",
 			"args": [
-				"build",
-				"-p",
-				"auto",
-				"-b",
-				"rpi_pico/rp2040/w",
-                "${input:application}",
-				"${input:usb_serial_port}",
-				"--",
-				"-DOPENOCD=\"${userHome}\"/.pico-sdk/openocd/0.12.0+dev/openocd.exe",
-				"-DOPENOCD_DEFAULT_PATH=\"${userHome}\"/.pico-sdk/openocd/0.12.0+dev/scripts"
+				"flash",
+				"--build-dir",
+				"\"${workspaceFolder}/build\""
 			],
-			"problemMatcher": [
-				"$gcc"
-			]
-		},
-        {
-			"label": "Zephyr Build RP2350",
-			"type": "shell",
-			"group": {
-				"kind": "build"
-			},			
 			"options": {
-				"env": {
-					"SNIPPET_ROOT": "${workspaceFolder}"
-				}
-			},
-			"linux": {
-				"command": "${workspaceFolder}/.venv/bin/west"
-			},
-			"windows": {
-				"command": "\"${workspaceFolder}\"/.venv/Scripts/west.exe"
-			},
-			"osx": {
-				"command": "${workspaceFolder}/.venv/Scripts/west"
-			},
-			"args": [
-				"build",
-				"-p",
-				"auto",
-				"-b",
-				"rpi_pico2/rp2350a/m33",
-                "${input:application}",
-				"${input:usb_serial_port}",
-				"--",
-				"-DOPENOCD=\"${userHome}\"/.pico-sdk/openocd/0.12.0+dev/openocd.exe",
-				"-DOPENOCD_DEFAULT_PATH=\"${userHome}\"/.pico-sdk/openocd/0.12.0+dev/scripts"
-			],
-			"problemMatcher": [
-				"$gcc"
-			]
+				"cwd": "${command:raspberry-pi-pico.getZephyrWorkspacePath}"
+			}
 		},
 		{
-			"label": "Zephyr Flash",
+			"label": "Run Project",
 			"type": "shell",
-			"group": {
-				"kind": "build"
-			},
-			"linux": {
-				"command": "${workspaceFolder}/.venv/bin/west"
-			},
-			"windows": {
-				"command": "\"${workspaceFolder}\"/.venv/Scripts/west.exe"
-			},
-			"osx": {
-				"command": "${workspaceFolder}/.venv/bin/west"
-			},
+			"command": "${command:raspberry-pi-pico.getPicotoolPath}",
 			"args": [
-				"flash"
-			]
-		},
-        {
-            "label": "Run Project",
-            "type": "shell",
-            "command": "${env:HOME}/.pico-sdk/picotool/2.1.1/picotool/picotool",
-            "args": [
-                "load",
-                "\"${workspaceFolder}\"/build/zephyr/zephyr.elf",
-                "-fx"
-            ],
-            "presentation": {
-                "reveal": "always",
-                "panel": "dedicated"
-            },
-            "problemMatcher": [],
-            "windows": {
-                "command": "\"${env:USERPROFILE}\"/.pico-sdk/picotool/2.1.1/picotool/picotool.exe"
-            }
-        }
+				"load",
+				"\"${workspaceFolder}/build/zephyr/zephyr.elf\"",
+				"-fx"
+			],
+			"presentation": {
+				"reveal": "always",
+				"panel": "dedicated"
+			},
+			"problemMatcher": []
+		}
 	],
 	"inputs": [
-	{
-		"id": "application",
-		"type": "promptString",
-		"description": "Application to build, e.g app",
-		"default": "app"
-	},
-	{
-		"id": "usb_serial_port",
-		"type": "pickString",
-		"description": "Select whether to use the UART serial port or the USB serial port",
-		"default": "",
-		"options": [
-			{"label": "UART", "value": ""},
-			{"label": "USB", "value": "-S usb_serial_port"}
-      ],
-	}
-  ]
+		{
+			"id": "application",
+			"type": "promptString",
+			"description": "Application to build, e.g app, blinky or wifi",
+			"default": "app"
+		},
+		{
+			"id": "usb_serial_port",
+			"type": "pickString",
+			"description": "Select whether to use the UART serial port or the USB serial port",
+			"default": "",
+			"options": [
+				{
+					"label": "UART",
+					"value": ""
+				},
+				{
+					"label": "USB",
+					"value": "-S usb_serial_port"
+				}
+			],
+		}
+	]
 }

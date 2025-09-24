@@ -1,0 +1,77 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Compile Project",
+			"type": "shell",
+			"command": "${command:raspberry-pi-pico.getWestPath}",
+			"args": [
+				"build",
+				"-p",
+				"auto",
+				"-b",
+				"rpi_pico2/rp2350a/m33/w",
+				"-d",
+				"\"${workspaceFolder}/build\"",
+				"\"${workspaceFolder}\"",
+				"--",
+				"-DOPENOCD=${command:raspberry-pi-pico.getOpenOCDRoot}/openocd",
+				"-DOPENOCD_DEFAULT_PATH=${command:raspberry-pi-pico.getOpenOCDRoot}/scripts"
+			],
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			},
+			"presentation": {
+				"reveal": "always",
+				"panel": "dedicated"
+			},
+			"problemMatcher": "$gcc",
+			"options": {
+				"cwd": "${command:raspberry-pi-pico.getZephyrWorkspacePath}"
+			},
+			"windows": {
+				"options": {
+					"shell": {
+						"executable": "cmd.exe",
+						"args": [
+							"/d",
+							"/c"
+						]
+					}
+				}
+			}
+		},
+		{
+			"label": "Flash",
+			"type": "shell",
+			"group": {
+				"kind": "build"
+			},
+			"command": "${command:raspberry-pi-pico.getWestPath}",
+			"args": [
+				"flash",
+				"--build-dir",
+				"\"${workspaceFolder}/build\""
+			],
+			"options": {
+				"cwd": "${command:raspberry-pi-pico.getZephyrWorkspacePath}"
+			}
+		},
+		{
+			"label": "Run Project",
+			"type": "shell",
+			"command": "${command:raspberry-pi-pico.getPicotoolPath}",
+			"args": [
+				"load",
+				"\"${workspaceFolder}/build/zephyr/zephyr.elf\"",
+				"-fx"
+			],
+			"presentation": {
+				"reveal": "always",
+				"panel": "dedicated"
+			},
+			"problemMatcher": []
+		}
+	]
+}

@@ -19,4 +19,5 @@ manifest:
         name-allowlist:
           - cmsis_6      # required by the ARM port
           - hal_rpi_pico # required for Pico board support
-          - hal_infineon
+          - hal_infineon # required for Wifi chip support
+          - segger       # required for Segger RTT support

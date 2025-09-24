@@ -1,0 +1,30 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Pico Debug (Zephyr)",
+            "cwd": "${workspaceFolder}",
+            "executable": "${workspaceFolder}/build/zephyr/zephyr.elf",
+            "request": "launch",
+            "type": "cortex-debug",
+            "servertype": "openocd",
+            "serverpath": "${command:raspberry-pi-pico.getOpenOCDRoot}/openocd",
+            "searchDir": [
+                "${command:raspberry-pi-pico.getOpenOCDRoot}/scripts"
+            ],
+            "toolchainPrefix": "arm-zephyr-eabi",
+            "armToolchainPath": "${command:raspberry-pi-pico.getZephyrWorkspacePath}/zephyr-sdk/arm-zephyr-eabi/bin",
+            "device": "${command:raspberry-pi-pico.getChipUppercase}",
+            "svdFile": "${userHome}/.pico-sdk/sdk/2.2.0/src/${command:raspberry-pi-pico.getChip}/hardware_regs/${command:raspberry-pi-pico.getChipUppercase}.svd",
+            "configFiles": [
+                "interface/cmsis-dap.cfg",
+                "target/${command:raspberry-pi-pico.getTarget}.cfg"
+            ],
+            "runToEntryPoint": "main",
+            "openOCDLaunchCommands": [
+                "adapter speed 5000"
+            ],
+            "rtos": "Zephyr"
+        }
+    ]
+}
