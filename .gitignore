@@ -1,3 +1,5 @@
+build/
+
 # Created by https://www.toptal.com/developers/gitignore/api/c,cmake,linux,macos,ninja,windows,visualstudiocode,python,venv
 # Edit at https://www.toptal.com/developers/gitignore?templates=c,cmake,linux,macos,ninja,windows,visualstudiocode,python,venv
 
