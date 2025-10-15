@@ -11,12 +11,15 @@ manifest:
 
   projects:
     - name: zephyr
+      repo-path: zephyr
       remote: zephyrproject-rtos
       revision: main
+      path: zephyr-main
       import:
         # By using name-allowlist we can clone only the modules that are
         # strictly needed by the application.
         name-allowlist:
           - cmsis_6      # required by the ARM port
           - hal_rpi_pico # required for Pico board support
-          - hal_infineon
+          - hal_infineon # required for Wifi chip support
+          - segger       # required for Segger RTT support

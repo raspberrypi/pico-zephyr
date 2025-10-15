@@ -25,7 +25,7 @@ Run the setup script:
 
 ```bash
 cd pico-zephyr
-./scripts/minimal_setup.sh
+./scripts/setup.sh
 ```
 
 This command will take a few minutes to run, as it is downloading and installing Zephyr dependencies.
@@ -41,25 +41,27 @@ While the command is running, plug your Pico board in via the Debug Probe:
 When the installation has finished, build the example image for your Pico:
 
 ```bash
-# For Pico H and Pico WH using RP2040:
-build_rp2040.sh
-# For Pico 2 and Pico 2W using RP2350:
-build_rp2350.sh
+# For Pico (H)
+./scripts/build.sh -b rpi_pico
+# For Pico W(H)
+./scripts/build.sh -b rpi_pico/rp2040/w
+# For Pico 2 (H)
+./scripts/build.sh -b rpi_pico2/rp2350a/m33
+# For Pico 2 W(H)
+./scripts/build.sh -b rpi_pico2/rp2350a/m33/w
 ```
 
 By default, this will use the UART serial port.
 To use the USB serial port which also powers the Pico, add `usb_serial_port` when building:
 
 ```bash
-# For Pico H and Pico WH using RP2040:
-build_rp2040.sh usb_serial_port
-# For Pico 2 and Pico 2W using RP2350:
-build_rp2350.sh usb_serial_port
+./scripts/build.sh -s
 ```
 
 Note that when switching between UART and USB serial, it may be necessary to delete the build directory for this change to take effect.
 
 Flash the Pico:
+
 ```bash
 . .venv/bin/activate
 west flash
@@ -71,21 +73,17 @@ Install VSCode with:
 
 ```bash
 ./scripts/vscode_setup.sh
+# Or add this to your setup command
+./scripts/setup.sh --vscode
 ```
 
-This will install VSCode and the [Cortex-Debug](https://marketplace.visualstudio.com/items?itemName=marus25.cortex-debug) extension.
+This will install Microsoft Visual Studio Code and the [pico-vscode](https://marketplace.visualstudio.com/items?itemName=raspberry-pi.raspberry-pi-pico) extension.
 
-Open this folder in VSCode. You can run `code .` from the command line.
+Open this folder in VSCode. (You can run `code .` from the command line.)
 
-To build, press `Ctrl+Shift+B` and select either `Zephyr Build RP2040` or `Zephyr Build RP2350` for the chip you are targetting.
-Select `app`.
-Select between the UART or USB for serial output.
-Note that when switching between UART and USB serial, it may be necessary to delete the build directory for this change to take effect.
-Press `Enter` to confirm the OpenOCD path or change it to the directory where OpenOCD is installed.
+To build, press the 'Compile' button in the bottom bar.
 
-To flash, press `Ctrl+Shift+B` and select `Zephyr Flash`.
-
-### View Output
+### View Output (Linux)
 
 View the output via serial port with:
 
@@ -102,24 +100,15 @@ Find the port using `ls /dev/tty*` while plugging and unplugging the debug probe
 ### Command Line
 
 Debug with gdb:
+
 ```bash
 west debug
 ...
 (gdb) break main
 (gdb) run
-Thread 1 "rp2350.dap.core0" hit Breakpoint 1, main () at /home/user/dev/pico-zephyr/app/src/main.c:8
-8               printk("Zephyr Example Application for Pico\n");
+...
 (gdb) n
-11                      printk("Running on %s...\n", CONFIG_BOARD);
-(gdb) n
-13                      k_sleep(K_MSEC(1000));
-(gdb) n
-10              while (1) {
-(gdb) n
-11                      printk("Running on %s...\n", CONFIG_BOARD);
-(gdb) n
-13                      k_sleep(K_MSEC(1000));
-(gdb) n
+...
 ```
 
 ### VSCode
@@ -136,7 +125,7 @@ Open this folder in VSCode. You can run `code .` from the command line.
 
 To debug, press `Ctrl+Shift+D` to open the `Run and Debug` pane.
 
-At the top, next to the `Start Debugging` button, you can select `RP2040 Debug (Zephyr)` or `RP2350 Debug (Zephyr)`  for the chip you are targetting.
+At the top, next to the `Start Debugging` button, you can select `RP2040 Debug (Zephyr)` or `RP2350 Debug (Zephyr)` for the chip you are targetting.
 Press `Enter` to confirm the OpenOCD path or change it to the directory where OpenOCD is installed.
 
 VSCode will then enter the debugging view starting in `main`, where you can step over each instruction and inspect the source code.
@@ -146,7 +135,7 @@ Further debugging instructions can be found [here](https://code.visualstudio.com
 
 ## Wifi Example
 
-The `wifi_example` connects to a Wi-Fi network, pings `8.8.8.8`, and performs HTTP GET and POST requests with JSON.
+The `wifi` example connects to a Wi-Fi network, pings `8.8.8.8`, and performs HTTP GET and POST requests with JSON.
 
 To begin, create a file in `wifi_example/src/` called `wifi_info.h` and add the SSID and PSK for the Wi-Fi network:
 
@@ -154,7 +143,7 @@ To begin, create a file in `wifi_example/src/` called `wifi_info.h` and add the 
 > NEVER COMMIT OR SHARE THIS FILE PUBLICLY - This could be a big security issue and is for demonstration purposes only
 
 ```c
-// wifi_example/src/wifi_info.h
+// wifi/src/wifi_info.h
 #define WIFI_SSID "MySSID"
 #define WIFI_PSK  "my_password"
 ```
@@ -162,7 +151,5 @@ To begin, create a file in `wifi_example/src/` called `wifi_info.h` and add the 
 Then build (currently only supports Pico W):
 
 ```bash
-./build_rp2040_w.sh wifi_example
+./scripts/build.sh -p wifi -b rpi_pico/rp2040/w
 ```
-
-Or to build using VSCode, press `Ctrl+Shift+B` and select `Zephyr Build RP2040_W`, then enter `wifi_example` for the application option before continuing with the other steps.
