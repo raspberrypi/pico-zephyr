@@ -13,7 +13,7 @@
                 "${command:raspberry-pi-pico.getOpenOCDRoot}/scripts"
             ],
             "toolchainPrefix": "arm-zephyr-eabi",
-            "armToolchainPath": "${command:raspberry-pi-pico.getZephyrWorkspacePath}/zephyr-sdk/arm-zephyr-eabi/bin",
+            "armToolchainPath": "${command:raspberry-pi-pico.getZephyrSDKPath}/arm-zephyr-eabi/bin",
             "device": "${command:raspberry-pi-pico.getChipUppercase}",
             "svdFile": "${userHome}/.pico-sdk/sdk/2.2.0/src/${command:raspberry-pi-pico.getChip}/hardware_regs/${command:raspberry-pi-pico.getChipUppercase}.svd",
             "configFiles": [
@@ -24,7 +24,8 @@
             "openOCDLaunchCommands": [
                 "adapter speed 5000"
             ],
-            "rtos": "Zephyr"
+            "rtos": "Zephyr",
+            "preLaunchTask": "Compile Project"
         }
     ]
 }

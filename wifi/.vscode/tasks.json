@@ -28,10 +28,16 @@
 			},
 			"problemMatcher": "$gcc",
 			"options": {
-				"cwd": "${command:raspberry-pi-pico.getZephyrWorkspacePath}"
+				"cwd": "${command:raspberry-pi-pico.getZephyrWorkspacePath}",
+				"env": {
+					"PATH": "${command:raspberry-pi-pico.getGitPath}:${env:PATH}:"
+				}
 			},
 			"windows": {
 				"options": {
+					"env": {
+						"Path": "${command:raspberry-pi-pico.getGitPath};${env:Path};"
+					},
 					"shell": {
 						"executable": "cmd.exe",
 						"args": [
@@ -71,7 +77,9 @@
 				"reveal": "always",
 				"panel": "dedicated"
 			},
-			"problemMatcher": []
+			"problemMatcher": [],
+			"dependsOrder": "sequence",
+			"dependsOn": "Compile Project"
 		}
 	]
 }

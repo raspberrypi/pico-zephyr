@@ -11,8 +11,10 @@ manifest:
 
   projects:
     - name: zephyr
+      repo-path: zephyr
       remote: zephyrproject-rtos
       revision: main
+      path: zephyr-main
       import:
         # By using name-allowlist we can clone only the modules that are
         # strictly needed by the application.
